@@ -19,7 +19,7 @@
   --text:#0b0b0b; --text-2:#52514e; --muted:#8a8984;
   --accent:#2a78d6; --accent-soft:#e3eefb;
   --good:#0a7d33; --good-soft:#e2f4e8; --bad:#c43a39; --bad-soft:#fbe6e5; --warn:#a86a00; --warn-soft:#fdf1d8;
-  --c-estudio:#2a78d6; --c-lectura:#1baf7a; --c-manual:#eda100; --c-clase:#6250d6;
+  --c-estudio:#2a78d6; --c-tarea:#0e8fa8; --c-lectura:#1baf7a; --c-manual:#eda100; --c-clase:#6250d6;
   --c-series:#eb6834; --c-scroll:#e34948; --c-otro:#9b9a94;
   --radius:14px; --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
 }
@@ -30,7 +30,7 @@
     --text:#f0efec; --text-2:#c3c2b7; --muted:#8d8c85;
     --accent:#3987e5; --accent-soft:#1d2b3d;
     --good:#3fbf6a; --good-soft:#16301f; --bad:#e66767; --bad-soft:#3a1d1d; --warn:#e0a63a; --warn-soft:#352914;
-    --c-estudio:#3987e5; --c-lectura:#199e70; --c-manual:#c98500; --c-clase:#9085e9;
+    --c-estudio:#3987e5; --c-tarea:#26a9c2; --c-lectura:#199e70; --c-manual:#c98500; --c-clase:#9085e9;
     --c-series:#d95926; --c-scroll:#e66767; --c-otro:#7a7973;
     --shadow:none;
   }
@@ -81,7 +81,7 @@ nav.tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--
 .btn.sm{padding:5px 10px;font-size:13px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .center{justify-content:center}
-label.f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--text-2);min-width:0}
+label.f,div.f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--text-2);min-width:0}
 input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{border:1px solid var(--border);background:var(--surface);border-radius:9px;padding:8px 10px;width:100%;min-width:0}
 textarea{resize:vertical;min-height:60px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
@@ -154,6 +154,26 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
 .auth .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;margin:16px 0}
 .auth .or:before,.auth .or:after{content:"";flex:1;height:1px;background:var(--border)}
 .linkbtn{border:0;background:none;color:var(--accent);cursor:pointer;padding:0;font-size:13px;align-self:flex-start}
+.uni-pick{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px;padding:10px;border-radius:12px;background:var(--surface-2)}
+.uni-pick select{width:auto;flex:1;min-width:160px}
+.uni-pick .seg-ctl{background:var(--surface)}
+.uni-pick .seg-ctl button.on{background:var(--surface-2)}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;outline:2px solid transparent;outline-offset:1px}
+.swatch.on{outline-color:var(--text)}
+.term{margin-top:6px}
+.term+.term{margin-top:22px}
+.term-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.term-h b{font-size:14px}
+.subj{display:grid;grid-template-columns:12px 1fr auto;gap:4px 12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.subj:last-child{border-bottom:0}
+.subj .dot{width:12px;height:12px;border-radius:50%}
+.subj .nm{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subj .hrs{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+.subj .meta{grid-column:2/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--text-2)}
+.subj .mini{display:flex;height:6px;border-radius:999px;overflow:hidden;background:var(--surface-2);width:120px}
+.subj .acts{margin-left:auto;display:flex;gap:4px}
+.subj .mini i{display:block;height:100%}
 .user{font-size:13px;color:var(--text-2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
@@ -191,6 +211,7 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
 
   <nav class="tabs" role="tablist">
     <button class="on" data-tab="hoy">Hoy</button>
+    <button data-tab="uni">Universidad</button>
     <button data-tab="stats">Estadísticas</button>
     <button data-tab="ajustes">Objetivos y ajustes</button>
     <button data-tab="excel">Excel</button>
@@ -202,6 +223,10 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
       <div class="card">
         <h2>Temporizador <small id="timerHint">elige actividad</small></h2>
         <div class="chips" id="timerCats"></div>
+        <div class="uni-pick hidden" id="uniPick">
+          <div class="seg-ctl" id="uniType"></div>
+          <select id="uniSubj" aria-label="Asignatura"></select>
+        </div>
         <div class="timer-face" id="timerFace">00:00:00</div>
         <div class="timer-sub" id="timerSub">&nbsp;</div>
         <div class="row center" style="margin-top:10px" id="timerTargetRow">
@@ -243,6 +268,7 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
         <form id="manualForm" class="form-grid">
           <label class="f span2">Actividad<select id="mCat"></select></label>
           <label class="f span2">Fecha<input type="date" id="mDate"></label>
+          <label class="f span4" id="mSubjWrap">Asignatura<select id="mSubj"></select></label>
           <label class="f">Desde<input type="time" id="mFrom"></label>
           <label class="f">Hasta<input type="time" id="mTo"></label>
           <label class="f span2">…o minutos<input type="number" id="mMin" min="1" max="1440" placeholder="ej. 45"></label>
@@ -262,6 +288,35 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
     <div class="card" style="margin-top:16px">
       <h2>Registros de hoy <small id="entriesCount"></small></h2>
       <div class="list" id="entries"></div>
+    </div>
+  </section>
+
+  <!-- ============ UNIVERSIDAD ============ -->
+  <section id="tab-uni" class="hidden">
+    <div class="grid g2">
+      <div class="card">
+        <h2>Nueva asignatura</h2>
+        <form id="subjForm" class="form-grid">
+          <label class="f span4">Nombre<input type="text" id="sjName" maxlength="60" required placeholder="ej. Algorítmica"></label>
+          <label class="f span4">Cuatrimestre<input type="text" id="sjTerm" maxlength="40" list="termList" placeholder="ej. 1er cuatri 2026/27"><datalist id="termList"></datalist></label>
+          <div class="f span4">Color<div class="swatches" id="sjColors"></div></div>
+          <div class="span4 row"><button class="btn primary" type="submit">Crear asignatura</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Horas por asignatura <small>en curso</small></h2>
+        <div class="legend" id="uniLegend"></div>
+        <div class="chart-box sm" id="uniChartBox"><canvas id="chUni" aria-label="Horas por asignatura"></canvas></div>
+        <div class="muted small hidden" id="uniChartEmpty">Cuando registres tiempo en una asignatura aparecerá aquí.</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Asignaturas en curso <small id="uniActiveCount"></small></h2>
+      <div id="uniActive"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Cuatrimestres cerrados <small>historial</small></h2>
+      <div id="uniClosed"></div>
     </div>
   </section>
 
@@ -321,7 +376,7 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
       <div class="card">
         <h2>Editar objetivos</h2>
         <div class="setrow"><span>Puntos diarios objetivo</span><input type="number" min="1" id="sDailyPts"></div>
-        <div class="setrow"><span>Horas de estudio por semana</span><input type="number" min="0" step="0.5" id="sWeekStudy"></div>
+        <div class="setrow"><span>Horas de universidad por semana <span class="muted small">(estudio + tareas)</span></span><input type="number" min="0" step="0.5" id="sWeekStudy"></div>
         <div class="setrow"><span>Máx. horas de pantallas (series + scroll) por semana</span><input type="number" min="0" step="0.5" id="sWeekScreen"></div>
         <div class="setrow"><span>Puntos semanales objetivo</span><input type="number" min="1" id="sWeekPts"></div>
       </div>
@@ -369,8 +424,9 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
 <script>
 /* ================= MODELO ================= */
 const CATS = [
-  {id:'estudio', name:'Estudio',           icon:'📚'},
-  {id:'clase',   name:'Clase',             icon:'🎓'},
+  {id:'clase',   name:'Clase',             icon:'🎓', uni:true},
+  {id:'estudio', name:'Estudio',           icon:'📚', uni:true},
+  {id:'tarea',   name:'Tareas',            icon:'📝', uni:true},
   {id:'lectura', name:'Lectura',           icon:'📖'},
   {id:'manual',  name:'Hobbies manuales',  icon:'🧶'},
   {id:'series',  name:'Series',            icon:'📺', neg:true},
@@ -378,11 +434,14 @@ const CATS = [
   {id:'otro',    name:'Otro',              icon:'🌿'},
 ];
 const CAT = Object.fromEntries(CATS.map(c=>[c.id,c]));
+const UNI = CATS.filter(c=>c.uni);
+const SUBJ_COLORS = ['#2a78d6','#6250d6','#1baf7a','#eda100','#eb6834','#d6457f','#0e8fa8','#8a6a4a'];
 const DEFAULTS = {
   basePts:10,
-  mult:{estudio:2, clase:1, lectura:1, manual:1, otro:0},
+  mult:{estudio:2, tarea:2, clase:1, lectura:1, manual:1, otro:0},
   free:30, block:60, blockPts:15,
-  dailyPts:40, weekStudy:15, weekScreen:7, weekPts:250
+  dailyPts:40, weekStudy:15, weekScreen:7, weekPts:250,
+  subjects:[]
 };
 const MOODS = [{v:1,e:'😞',t:'Fatal'},{v:2,e:'😕',t:'Regular'},{v:3,e:'😐',t:'Normal'},{v:4,e:'🙂',t:'Bien'},{v:5,e:'😄',t:'Genial'}];
 
@@ -411,6 +470,11 @@ function month(key){ if(!S.months[key]) S.months[key]={entries:[],moods:{}}; ret
 const allEntries = ()=>Object.values(S.months).flatMap(m=>m.entries);
 const entriesOn = date=>(S.months[date.slice(0,7)]?.entries||[]).filter(e=>e.date===date);
 const moodOn = date=>S.months[date.slice(0,7)]?.moods?.[date];
+const subjects = ()=>(S.settings.subjects ||= []);
+const SUBJ = id=>subjects().find(x=>x.id===id);
+const subjName = id=>id?(SUBJ(id)?.name||'Asignatura eliminada'):'';
+const activeSubjects = ()=>subjects().filter(x=>!x.closed);
+const catLabel = e=>CAT[e.cat].name+(e.subj?' · '+subjName(e.subj):'');
 
 /* ================= PUNTOS ================= */
 function entryPts(e,s=S.settings){ if(CAT[e.cat]?.neg) return 0; return (s.mult[e.cat]||0)*s.basePts*e.min/60; }
@@ -587,9 +651,12 @@ function deleteEntry(id){
 
 /* ---- Temporizador ---- */
 let selCat='estudio', selTarget=0, audioCtx=null, beeped=false;
+let selSubj=(()=>{try{return localStorage.getItem('foco-lastSubj')||''}catch(e){return ''}})();
+function setSelSubj(v){ selSubj=v; try{localStorage.setItem('foco-lastSubj',v)}catch(e){} }
 function startTimer(){
   try{ audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
-  S.timer={cat:selCat,start:Date.now(),target:selTarget}; beeped=false;
+  const subj=CAT[selCat].uni&&SUBJ(selSubj)&&!SUBJ(selSubj).closed?selSubj:'';
+  S.timer={cat:selCat,subj,start:Date.now(),target:selTarget}; beeped=false;
   markDirty('settings'); renderAll();
 }
 function stopTimer(save=true){
@@ -599,9 +666,9 @@ function stopTimer(save=true){
   if(save){
     if(min<1){ toast('Menos de 1 minuto: no se ha guardado'); renderAll(); return; }
     const d=new Date(t.start);
-    addEntry({id:uid(),date:ymd(d),start:hm(d),min,cat:t.cat,mode:'temporizador',note:''});
+    addEntry({id:uid(),date:ymd(d),start:hm(d),min,cat:t.cat,subj:CAT[t.cat].uni?(t.subj||''):'',mode:'temporizador',note:''});
     const p=entryPts({cat:t.cat,min});
-    toast(CAT[t.cat].neg?`${CAT[t.cat].name}: ${fmtH(min)} registrados`:`+${Math.round(p)} pts · ${CAT[t.cat].name} ${fmtH(min)}`);
+    toast(CAT[t.cat].neg?`${CAT[t.cat].name}: ${fmtH(min)} registrados`:`+${Math.round(p)} pts · ${catLabel(t)} ${fmtH(min)}`);
   } else renderAll();
 }
 function beep(){ try{ if(!audioCtx) return; const o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.frequency.value=880; g.gain.value=.15; o.connect(g).connect(audioCtx.destination); o.start(); setTimeout(()=>{o.frequency.value=660},250); setTimeout(()=>o.stop(),600);}catch(e){} }
@@ -609,8 +676,21 @@ function beep(){ try{ if(!audioCtx) return; const o=audioCtx.createOscillator(),
 /* ================= RENDER: HOY ================= */
 function renderTimerCats(){
   const t=S.timer;
-  $('#timerCats').innerHTML=CATS.map(c=>`<button class="chip ${c.neg?'neg':''} ${(t?t.cat:selCat)===c.id?'on':''}" data-cat="${c.id}" ${t?'disabled':''}><span class="dot" style="background:${color(c.id)}"></span>${c.icon} ${c.name}</button>`).join('');
-  $('#timerCats').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ if(S.timer) return; selCat=b.dataset.cat; renderTimerCats(); tickTimer(); });
+  const cur=t?t.cat:selCat, isUni=!!CAT[cur].uni;
+  $('#timerCats').innerHTML=`<button class="chip ${isUni?'on':''}" data-cat="uni" ${t?'disabled':''}><span class="dot" style="background:${color('estudio')}"></span>🏛️ Universidad</button>`+
+    CATS.filter(c=>!c.uni).map(c=>`<button class="chip ${c.neg?'neg':''} ${cur===c.id?'on':''}" data-cat="${c.id}" ${t?'disabled':''}><span class="dot" style="background:${color(c.id)}"></span>${c.icon} ${c.name}</button>`).join('');
+  $('#timerCats').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ if(S.timer) return; const v=b.dataset.cat; if(v!=='uni') selCat=v; else if(!CAT[selCat].uni) selCat='estudio'; renderTimerCats(); tickTimer(); });
+  $('#uniPick').classList.toggle('hidden',!isUni);
+  if(isUni){
+    $('#uniType').innerHTML=UNI.map(c=>`<button type="button" data-u="${c.id}" class="${cur===c.id?'on':''}" ${t?'disabled':''}>${c.icon} ${c.name}</button>`).join('');
+    $('#uniType').querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(S.timer) return; selCat=b.dataset.u; renderTimerCats(); tickTimer(); });
+    const act=activeSubjects(), sv=t?(t.subj||''):(SUBJ(selSubj)&&!SUBJ(selSubj).closed?selSubj:(act[0]?.id||''));
+    if(!t && sv!==selSubj) setSelSubj(sv);
+    const opts=(t&&t.subj&&SUBJ(t.subj)?.closed?[SUBJ(t.subj)]:[]).concat(act);
+    $('#uniSubj').innerHTML=(act.length?'':'<option value="" disabled>Crea tus asignaturas en la pestaña Universidad</option>')+
+      opts.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')+'<option value="">Sin asignatura</option>';
+    $('#uniSubj').value=sv; $('#uniSubj').disabled=!!t;
+  }
   $('#targetCtl').querySelectorAll('button').forEach(b=>{ b.classList.toggle('on',Number(b.dataset.t)===(t?t.target:selTarget)); b.disabled=!!t; });
   $('#timerBtn').textContent=t?'Parar y guardar':'Empezar';
   $('#timerBtn').className='btn big '+(t?'danger':'primary');
@@ -638,14 +718,14 @@ function tickTimer(){
     if(st.penalty>0) alert=`<div class="alert bad">Llevas ${fmtH(st.screen)} de pantallas hoy: <b>−${st.penalty} pts</b>. Siguiente −${s.blockPts} en ${Math.ceil(toNext)} min. ¿Lo dejas aquí y te pones con algo?</div>`;
     else if(toNext<=15) alert=`<div class="alert warn">En ${Math.ceil(toNext)} min empiezas a perder puntos (−${s.blockPts}).</div>`;
   } else {
-    $('#timerSub').textContent=`${c.icon} ${c.name} · ${fmtPts(entryPts({cat:t.cat,min}))} pts hasta ahora`;
+    $('#timerSub').textContent=`${c.icon} ${catLabel(t)} · ${fmtPts(entryPts({cat:t.cat,min}))} pts hasta ahora`;
   }
   if(t.target && sec>=t.target*60){
     alert=`<div class="alert good">⏰ ¡Meta de ${t.target} min cumplida! Para y descansa, o sigue si estás en racha.</div>`+alert;
     if(!beeped){ beeped=true; beep(); }
   }
   if($('#timerAlert').innerHTML!==alert) $('#timerAlert').innerHTML=alert;
-  document.title=`${$('#timerFace').textContent} · ${c.name}`;
+  document.title=`${$('#timerFace').textContent} · ${catLabel(t)}`;
   if(sec%30===0) renderToday(); // refresca puntos en vivo
 }
 function renderToday(){
@@ -676,7 +756,7 @@ function renderTimeline(){
   $('#tlLegend').innerHTML=used.length?used.map(c=>`<span><i style="background:${color(c)}"></i>${CAT[c].name}</span>`).join(''):'<span class="muted">Nada con hora todavía</span>';
   const toPct=(h,m)=>(h*60+m)/1440*100;
   let html=list.map(e=>{const [h,m]=e.start.split(':').map(Number);const l=toPct(h,m),w=Math.min(e.min/1440*100,100-l);
-    return `<div class="seg" style="left:${l}%;width:${w}%;background:${color(e.cat)}" title="${CAT[e.cat].name} · ${e.start} · ${fmtH(e.min)}"></div>`}).join('');
+    return `<div class="seg" style="left:${l}%;width:${w}%;background:${color(e.cat)}" title="${esc(catLabel(e))} · ${e.start} · ${fmtH(e.min)}"></div>`}).join('');
   if(S.timer && ymd(new Date(S.timer.start))===d){const st=new Date(S.timer.start);const l=toPct(st.getHours(),st.getMinutes());const w=Math.max((Date.now()-S.timer.start)/60000/1440*100,.3);
     html+=`<div class="seg live" style="left:${l}%;width:${w}%;background:${color(S.timer.cat)}" title="En marcha"></div>`;}
   const now=new Date(); html+=`<div style="position:absolute;top:0;bottom:0;width:2px;background:var(--text);left:${toPct(now.getHours(),now.getMinutes())}%" title="Ahora"></div>`;
@@ -687,7 +767,7 @@ function renderEntries(){
   const list=entriesOn(today()).slice().sort((a,b)=>(a.start||'99').localeCompare(b.start||'99'));
   $('#entriesCount').textContent=list.length?`${list.length} · ${fmtH(list.reduce((a,e)=>a+e.min,0))}`:'';
   $('#entries').innerHTML=list.length?list.map(e=>{const c=CAT[e.cat],p=entryPts(e);
-    return `<div class="item"><span class="dot" style="background:${color(e.cat)}"></span><span class="muted small" style="width:42px">${e.start||'—'}</span><span class="grow">${c.icon} ${c.name} · ${fmtH(e.min)}${e.note?` <span class="muted">· ${esc(e.note)}</span>`:''} <span class="muted small">${e.mode==='temporizador'?'⏱':'✍️'}</span></span><span class="pts" style="color:${c.neg?'var(--bad)':'var(--good)'}">${c.neg?'pantalla':fmtPts(p)}</span><button class="x" data-del="${e.id}" title="Eliminar">✕</button></div>`}).join('')
+    return `<div class="item"><span class="dot" style="background:${color(e.cat)}"></span><span class="muted small" style="width:42px">${e.start||'—'}</span><span class="grow">${c.icon} ${c.name}${e.subj?` · <b>${esc(subjName(e.subj))}</b>`:''} · ${fmtH(e.min)}${e.note?` <span class="muted">· ${esc(e.note)}</span>`:''} <span class="muted small">${e.mode==='temporizador'?'⏱':'✍️'}</span></span><span class="pts" style="color:${c.neg?'var(--bad)':'var(--good)'}">${c.neg?'pantalla':fmtPts(p)}</span><button class="x" data-del="${e.id}" title="Eliminar">✕</button></div>`}).join('')
     :'<div class="muted small">Sin registros hoy.</div>';
   $('#entries').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteEntry(b.dataset.del));
 }
@@ -710,7 +790,10 @@ $('#moodNote').addEventListener('input',()=>{clearTimeout(noteT);noteT=setTimeou
 
 /* ---- Formulario manual ---- */
 function initManual(){
-  $('#mCat').innerHTML=CATS.map(c=>`<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
+  const opt=c=>`<option value="${c.id}">${c.icon} ${c.name}</option>`;
+  $('#mCat').innerHTML=`<optgroup label="🏛️ Universidad">${UNI.map(opt).join('')}</optgroup><optgroup label="Otras">${CATS.filter(c=>!c.uni).map(opt).join('')}</optgroup>`;
+  $('#mCat').value='estudio';
+  $('#mCat').addEventListener('change',fillManualSubj);
   $('#mDate').value=today();
   const prev=()=>{const m=manualMinutes(); const c=$('#mCat').value;
     $('#mPreview').textContent=m?(CAT[c].neg?`${fmtH(m)} de pantallas`:`${fmtH(m)} → ${fmtPts(entryPts({cat:c,min:m}))} pts`):''};
@@ -718,9 +801,18 @@ function initManual(){
   $('#manualForm').addEventListener('submit',ev=>{
     ev.preventDefault();
     const min=manualMinutes(); if(!min){ toast('Indica desde/hasta o los minutos'); return; }
-    addEntry({id:uid(),date:$('#mDate').value||today(),start:$('#mFrom').value||'',min,cat:$('#mCat').value,mode:'manual',note:$('#mNote').value.trim()});
+    const cat=$('#mCat').value; if(CAT[cat].uni) setSelSubj($('#mSubj').value);
+    addEntry({id:uid(),date:$('#mDate').value||today(),start:$('#mFrom').value||'',min,cat,subj:CAT[cat].uni?$('#mSubj').value:'',mode:'manual',note:$('#mNote').value.trim()});
     toast('Añadido ✔'); $('#mFrom').value=$('#mTo').value=$('#mMin').value=$('#mNote').value=''; $('#mPreview').textContent='';
   });
+}
+function fillManualSubj(){
+  const uni=!!CAT[$('#mCat').value]?.uni;
+  $('#mSubjWrap').classList.toggle('hidden',!uni);
+  if(!uni) return;
+  const act=activeSubjects(), keep=$('#mSubj').value||selSubj;
+  $('#mSubj').innerHTML=act.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')+'<option value="">Sin asignatura</option>';
+  $('#mSubj').value=act.some(x=>x.id===keep)?keep:(act[0]?.id||'');
 }
 function manualMinutes(){
   const f=$('#mFrom').value,t=$('#mTo').value;
@@ -737,11 +829,11 @@ function renderStats(){
   const stats=days.map(d=>({d,...dayStats(d),mood:moodOn(d)?.v??null}));
   $('#rangeLabel').textContent=`${fmtDay(days[0])} – ${fmtDay(days.at(-1))}`;
   const sum=f=>stats.reduce((a,x)=>a+f(x),0);
-  const study=sum(x=>x.by.estudio), screen=sum(x=>x.screen), pts=sum(x=>x.net), pen=sum(x=>x.penalty);
+  const study=sum(x=>x.by.estudio+x.by.tarea), cls=sum(x=>x.by.clase), screen=sum(x=>x.screen), pts=sum(x=>x.net), pen=sum(x=>x.penalty);
   const moods=stats.filter(x=>x.mood), avgMood=moods.length?moods.reduce((a,x)=>a+x.mood,0)/moods.length:null;
   const hit=stats.filter(x=>x.net>=s.dailyPts).length;
   $('#kpis').innerHTML=[
-    ['Horas de estudio',r1(study/60)+' h',`${r1(study/60/range)} h/día de media`],
+    ['Universidad',r1((study+cls)/60)+' h',`${r1(study/60)} h estudio y tareas · ${r1(cls/60)} h clase`],
     ['Puntos netos',Math.round(pts),`${Math.round(pts/range)} pts/día · −${pen} por pantallas`],
     ['Pantallas',r1(screen/60)+' h',`${r1(screen/60/range)} h/día · series + scroll`],
     ['Ánimo medio',avgMood?r1(avgMood)+' / 5':'—',`${hit}/${range} días con objetivo cumplido`],
@@ -782,15 +874,96 @@ function renderStats(){
     stats.slice().reverse().map(x=>`<tr><td>${fmtDay(x.d)}</td>${CATS.map(c=>`<td>${x.by[c.id]?r1(x.by[c.id]/60)+'h':'<span class="muted">·</span>'}</td>`).join('')}<td>+${Math.round(x.pos)}</td><td>${x.penalty?'−'+x.penalty:'0'}</td><td><b>${Math.round(x.net)}</b></td><td>${x.mood?MOODS[x.mood-1].e:'—'}</td></tr>`).join('')+'</tbody>';
 }
 
+/* ================= UNIVERSIDAD ================= */
+function subjTotals(){
+  const t={}, ws=weekStart(today());
+  allEntries().forEach(e=>{ if(!CAT[e.cat]?.uni) return; const k=e.subj&&SUBJ(e.subj)?e.subj:'';
+    const o=t[k]||(t[k]={clase:0,estudio:0,tarea:0,total:0,week:0});
+    o[e.cat]+=e.min; o.total+=e.min; if(e.date>=ws) o.week+=e.min; });
+  return t;
+}
+function guessTerm(){ const d=new Date(), m=d.getMonth()+1, y=d.getFullYear();
+  if(m>=9) return `1er cuatri ${y}/${String(y+1).slice(2)}`;
+  if(m===1) return `1er cuatri ${y-1}/${String(y).slice(2)}`;
+  return `2º cuatri ${y-1}/${String(y).slice(2)}`; }
+let sjColor=null;
+function renderSubjForm(){
+  const terms=[...new Set(subjects().map(x=>x.term).filter(Boolean))];
+  $('#termList').innerHTML=[guessTerm(),...terms].filter((v,i,a)=>a.indexOf(v)===i).map(v=>`<option value="${esc(v)}">`).join('');
+  if(!$('#sjTerm').value) $('#sjTerm').value=activeSubjects().at(-1)?.term||guessTerm();
+  if(!sjColor) sjColor=SUBJ_COLORS[subjects().length%SUBJ_COLORS.length];
+  $('#sjColors').innerHTML=SUBJ_COLORS.map(c=>`<button type="button" class="swatch ${c===sjColor?'on':''}" style="background:${c}" data-c="${c}" aria-label="Color ${c}"></button>`).join('');
+  $('#sjColors').querySelectorAll('.swatch').forEach(b=>b.onclick=()=>{sjColor=b.dataset.c;renderSubjForm();});
+}
+$('#subjForm').addEventListener('submit',ev=>{
+  ev.preventDefault();
+  const name=$('#sjName').value.trim(); if(!name) return;
+  if(activeSubjects().some(x=>x.name.toLowerCase()===name.toLowerCase())){ toast('Ya tienes una asignatura en curso con ese nombre'); return; }
+  const x={id:uid(),name,term:$('#sjTerm').value.trim(),color:sjColor,closed:false,created:today()};
+  subjects().push(x); if(!SUBJ(selSubj)||SUBJ(selSubj).closed) setSelSubj(x.id);
+  $('#sjName').value=''; sjColor=null;
+  markDirty('settings'); renderAll(); toast(`Asignatura creada: ${name}`);
+});
+function subjRow(x,o,closed){
+  o=o||{clase:0,estudio:0,tarea:0,total:0,week:0};
+  const mini=o.total?UNI.map(c=>o[c.id]?`<i style="width:${o[c.id]/o.total*100}%;background:${color(c.id)}" title="${c.name}: ${fmtH(o[c.id])}"></i>`:'').join(''):'';
+  const parts=UNI.filter(c=>o[c.id]).map(c=>`${c.icon} ${r1(o[c.id]/60)} h`).join(' · ')||'sin horas todavía';
+  return `<div class="subj"><span class="dot" style="background:${x.color}"></span><span class="nm">${esc(x.name)}</span><span class="hrs">${r1(o.total/60)} h</span>
+    <div class="meta"><span class="mini">${mini}</span><span>${parts}</span>${!closed&&o.week?`<span>· esta semana ${fmtH(o.week)}</span>`:''}${closed&&x.closedAt?`<span>· cerrada el ${fmtDay(x.closedAt)}</span>`:''}
+      <span class="acts">${closed?`<button class="btn sm" data-reopen="${x.id}">Reabrir</button>`:`<button class="btn sm" data-rename="${x.id}" title="Cambiar nombre">✎</button><button class="btn sm" data-close="${x.id}">Cerrar</button>`}<button class="x" data-delsubj="${x.id}" title="Eliminar">✕</button></span></div></div>`;
+}
+function groupByTerm(list){ const g={}; list.forEach(x=>(g[x.term||'Sin cuatrimestre']||=[]).push(x)); return Object.entries(g); }
+let uniChart=null;
+function renderUni(){
+  if($('#tab-uni').classList.contains('hidden')) return;
+  renderSubjForm();
+  const tot=subjTotals(), act=activeSubjects(), closed=subjects().filter(x=>x.closed);
+  $('#uniActiveCount').textContent=act.length?`${act.length}`:'';
+  $('#uniActive').innerHTML=act.length?groupByTerm(act).map(([term,list])=>{
+      const h=list.reduce((a,x)=>a+(tot[x.id]?.total||0),0);
+      return `<div class="term"><div class="term-h"><b>${esc(term)} <span class="muted small">· ${r1(h/60)} h</span></b><button class="btn sm" data-closeterm="${esc(term)}">Cerrar cuatrimestre</button></div>${list.map(x=>subjRow(x,tot[x.id])).join('')}</div>`}).join('')
+    +(tot['']?.total?`<div class="small muted" style="margin-top:10px">Además tienes ${fmtH(tot[''].total)} de universidad sin asignatura asignada.</div>`:'')
+    :'<div class="muted small">Todavía no tienes asignaturas en curso. Crea la primera arriba 👆</div>';
+  $('#uniClosed').innerHTML=closed.length?groupByTerm(closed).map(([term,list])=>{
+      const h=list.reduce((a,x)=>a+(tot[x.id]?.total||0),0);
+      return `<div class="term"><div class="term-h"><b>${esc(term)} <span class="muted small">· ${r1(h/60)} h en total</span></b></div>${list.map(x=>subjRow(x,tot[x.id],true)).join('')}</div>`}).join('')
+    :'<div class="muted small">Cuando acabes un cuatrimestre, ciérralo y aquí quedará el resumen de horas de cada asignatura.</div>';
+  const q=(a,f)=>$('#tab-uni').querySelectorAll(`[${a}]`).forEach(b=>b.onclick=()=>f(b.getAttribute(a)));
+  q('data-close',id=>{const x=SUBJ(id); x.closed=true; x.closedAt=today(); markDirty('settings'); renderAll();
+    toast(`Cerrada: ${x.name}`,()=>{x.closed=false;delete x.closedAt;markDirty('settings');renderAll();});});
+  q('data-reopen',id=>{const x=SUBJ(id); x.closed=false; delete x.closedAt; markDirty('settings'); renderAll(); toast(`Reabierta: ${x.name}`);});
+  q('data-rename',id=>{const x=SUBJ(id); const n=prompt('Nuevo nombre de la asignatura',x.name); if(n&&n.trim()){x.name=n.trim().slice(0,60); markDirty('settings'); renderAll();}});
+  q('data-closeterm',term=>{const list=act.filter(x=>(x.term||'Sin cuatrimestre')===term);
+    if(!confirm(`¿Cerrar las ${list.length} asignaturas de «${term}»? Sus horas quedarán guardadas en el historial y podrás reabrirlas.`)) return;
+    list.forEach(x=>{x.closed=true;x.closedAt=today();}); markDirty('settings'); renderAll();
+    toast(`Cuatrimestre cerrado: ${term}`,()=>{list.forEach(x=>{x.closed=false;delete x.closedAt;});markDirty('settings');renderAll();});});
+  q('data-delsubj',id=>{const x=SUBJ(id), h=tot[id]?.total||0;
+    if(!confirm(h?`«${x.name}» tiene ${fmtH(h)} registradas. Si la eliminas, esos registros se quedan pero sin asignatura. Si solo has terminado el cuatrimestre, mejor ciérrala. ¿Eliminar?`:`¿Eliminar «${x.name}»?`)) return;
+    Object.entries(S.months).forEach(([k,m])=>{let ch=false; m.entries.forEach(e=>{if(e.subj===id){e.subj='';ch=true;}}); if(ch) markDirty(k);});
+    S.settings.subjects=subjects().filter(y=>y.id!==id); if(selSubj===id) setSelSubj(''); markDirty('settings'); renderAll(); toast(`Eliminada: ${x.name}`);});
+  // gráfica
+  const withH=act.filter(x=>tot[x.id]?.total);
+  $('#uniChartEmpty').classList.toggle('hidden',withH.length>0);
+  $('#uniChartBox').classList.toggle('hidden',!withH.length);
+  $('#uniLegend').innerHTML=withH.length?UNI.map(c=>`<span><i style="background:${color(c.id)}"></i>${c.name}</span>`).join(''):'';
+  if(uniChart){uniChart.destroy();uniChart=null;}
+  if(!withH.length||typeof Chart==='undefined') return;
+  $('#uniChartBox').style.height=Math.max(160,withH.length*38+50)+'px';
+  const tx=cssv('--text-2'), grid=cssv('--border'), surf=cssv('--surface');
+  uniChart=new Chart($('#chUni'),{type:'bar',data:{labels:withH.map(x=>x.name),datasets:UNI.map(c=>({label:c.name,data:withH.map(x=>r1((tot[x.id][c.id]||0)/60)),backgroundColor:color(c.id),borderColor:surf,borderWidth:{left:0,right:2,top:0,bottom:0},borderSkipped:false,borderRadius:3,maxBarThickness:22}))},
+    options:{indexAxis:'y',maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:cssv('--text'),titleColor:surf,bodyColor:surf,padding:10,cornerRadius:8,filter:i=>i.raw>0,callbacks:{label:i=>` ${i.dataset.label}: ${fmtH(i.raw*60)}`}}},
+      scales:{x:{stacked:true,grid:{color:grid},border:{display:false},ticks:{color:tx,callback:v=>v+'h'}},y:{stacked:true,grid:{display:false},ticks:{color:tx}}}}});
+}
+
 /* ================= RENDER: AJUSTES ================= */
 function renderGoals(){
   const s=S.settings, ws=weekStart(today()), days=[...Array(7)].map((_,i)=>addDays(ws,i)).filter(d=>d<=today());
   const st=days.map(d=>dayStats(d,d===today()?liveExtra():null));
-  const study=st.reduce((a,x)=>a+x.by.estudio,0)/60, screen=st.reduce((a,x)=>a+x.screen,0)/60, pts=st.reduce((a,x)=>a+x.net,0);
+  const study=st.reduce((a,x)=>a+x.by.estudio+x.by.tarea,0)/60, screen=st.reduce((a,x)=>a+x.screen,0)/60, pts=st.reduce((a,x)=>a+x.net,0);
   const g=(label,val,goal,unit,inverse)=>{const pct=Math.max(0,Math.min(100,val/goal*100)); const ok=inverse?val<=goal:val>=goal;
     return `<div style="margin-bottom:14px"><div class="kv" style="border:0;padding:0"><span>${label}</span><span><b>${r1(val)}</b> / ${goal} ${unit}</span></div><div class="bar ${inverse?(ok?'good':'bad'):(ok?'good':'')}"><i style="width:${pct}%"></i></div><div class="small muted">${inverse?(ok?`Te quedan ${r1(goal-val)} ${unit} de margen`:`Te has pasado ${r1(val-goal)} ${unit}`):(ok?'¡Cumplido! 🎉':`Faltan ${r1(goal-val)} ${unit}`)}</div></div>`};
   $('#goalsProgress').innerHTML=`<div class="small muted" style="margin-bottom:10px">Semana desde el lunes ${fmtDay(ws)}</div>`+
-    g('📚 Horas de estudio',study,s.weekStudy,'h')+g('⭐ Puntos de la semana',pts,s.weekPts,'pts')+g('📺📱 Pantallas (máximo)',screen,s.weekScreen,'h',true);
+    g('🏛️ Universidad (estudio + tareas)',study,s.weekStudy,'h')+g('⭐ Puntos de la semana',pts,s.weekPts,'pts')+g('📺📱 Pantallas (máximo)',screen,s.weekScreen,'h',true);
 }
 function fillSettings(){
   const s=S.settings;
@@ -812,29 +985,32 @@ $('#saveSettings').onclick=()=>{
   document.querySelectorAll('[data-mult]').forEach(i=>{const v=Number(i.value);if(Number.isFinite(v)&&v>=0) s.mult[i.dataset.mult]=v});
   markDirty('settings'); renderAll(); toast('Ajustes guardados');
 };
-$('#resetSettings').onclick=()=>{ S.settings=structuredClone(DEFAULTS); markDirty('settings'); fillSettings(); renderAll(); toast('Valores por defecto restaurados'); };
+$('#resetSettings').onclick=()=>{ const keep=subjects(); S.settings=structuredClone(DEFAULTS); S.settings.subjects=keep; markDirty('settings'); fillSettings(); renderAll(); toast('Valores por defecto restaurados'); };
 
 /* ================= EXCEL ================= */
 function buildRows(){
   const entries=allEntries().slice().sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||'')));
-  const reg=entries.map(e=>({ID:e.id,Fecha:e.date,Inicio:e.start||'',Categoría:CAT[e.cat]?.name||e.cat,Minutos:e.min,Horas:r1(e.min/60),Modo:e.mode,Puntos:CAT[e.cat]?.neg?0:Math.round(entryPts(e)*10)/10,Nota:e.note||''}));
+  const reg=entries.map(e=>({ID:e.id,Fecha:e.date,Inicio:e.start||'',Categoría:CAT[e.cat]?.name||e.cat,Asignatura:subjName(e.subj),Minutos:e.min,Horas:r1(e.min/60),Modo:e.mode,Puntos:CAT[e.cat]?.neg?0:Math.round(entryPts(e)*10)/10,Nota:e.note||''}));
   const dates=[...new Set(entries.map(e=>e.date).concat(Object.values(S.months).flatMap(m=>Object.keys(m.moods))))].sort();
   const daily=dates.map(d=>{const st=dayStats(d),m=moodOn(d);const row={Fecha:d,Semana:weekStart(d)};
     CATS.forEach(c=>row[`${c.name} (h)`]=r1(st.by[c.id]/60));
     Object.assign(row,{'Pantallas (h)':r1(st.screen/60),'Puntos ganados':Math.round(st.pos),'Penalización':st.penalty,'Puntos netos':Math.round(st.net),'Objetivo cumplido':st.net>=S.settings.dailyPts?'Sí':'No','Ánimo (1-5)':m?.v??'','Nota ánimo':m?.note??''});return row;});
   const moods=Object.values(S.months).flatMap(m=>Object.entries(m.moods)).sort((a,b)=>a[0].localeCompare(b[0])).map(([d,m])=>({Fecha:d,'Ánimo (1-5)':m.v,Estado:MOODS[m.v-1]?.t||'',Nota:m.note||''}));
-  return {reg,daily,moods};
+  const tot=subjTotals();
+  const subjRows=subjects().map(x=>{const o=tot[x.id]||{};return {Asignatura:x.name,Cuatrimestre:x.term||'',Estado:x.closed?'Cerrada':'En curso',...Object.fromEntries(UNI.map(c=>[`${c.name} (h)`,r1((o[c.id]||0)/60)])),'Total (h)':r1((o.total||0)/60)}});
+  return {reg,daily,moods,subjRows};
 }
 $('#exportBtn').onclick=()=>{
   const msg=$('#exportMsg');
   if(typeof XLSX==='undefined'){msg.innerHTML='<div class="alert bad">No se ha podido cargar la librería de Excel. Recarga la página.</div>';return;}
-  const {reg,daily,moods}=buildRows();
+  const {reg,daily,moods,subjRows}=buildRows();
   if(!reg.length&&!moods.length){msg.innerHTML='<div class="alert warn">Todavía no hay datos que exportar.</div>';return;}
   const wb=XLSX.utils.book_new();
   const add=(rows,name,widths)=>{const ws=XLSX.utils.json_to_sheet(rows.length?rows:[{}]);ws['!cols']=widths.map(w=>({wch:w}));XLSX.utils.book_append_sheet(wb,ws,name)};
-  add(reg,'Registros',[14,11,7,18,8,7,13,8,40]);
+  add(reg,'Registros',[14,11,7,18,24,8,7,13,8,40]);
   add(daily,'Resumen diario',[11,11,...CATS.map(()=>12),12,13,12,12,14,10,40]);
   add(moods,'Ánimo',[11,10,10,50]);
+  if(subjRows.length) add(subjRows,'Asignaturas',[28,20,10,10,10,10,10]);
   const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
   const url=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
   const a=document.createElement('a'); a.href=url; a.download=`foco-${today()}.xlsx`; document.body.appendChild(a); a.click(); a.remove();
@@ -854,21 +1030,23 @@ $('#importFile').addEventListener('change',async ev=>{
     const toDate=v=>{ if(v instanceof Date) return ymd(v); if(typeof v==='number'){const d=new Date(Math.round((v-25569)*864e5));return ymd(new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));} const s=String(v||'').trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s; const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m?`${m[3]}-${pad(m[2])}-${pad(m[1])}`:null; };
     const toTime=v=>{ if(v instanceof Date) return hm(v); if(typeof v==='number'){const t=Math.round(v%1*1440);return `${pad(Math.floor(t/60))}:${pad(t%60)}`;} const s=String(v||'').trim(); const m=s.match(/^(\d{1,2}):(\d{2})/); return m?`${pad(m[1])}:${m[2]}`:''; };
     const catFrom=v=>{const s=String(v||'').trim().toLowerCase(); return CATS.find(c=>c.id===s||c.name.toLowerCase()===s)?.id||null};
-    const existing=new Set(allEntries().map(e=>e.id)); const touched=new Set(); let added=0, skipped=0, moodsN=0;
+    const existing=new Set(allEntries().map(e=>e.id)); const touched=new Set(); let added=0, skipped=0, moodsN=0, newSubj=0;
+    const subjFrom=v=>{const n=String(v||'').trim(); if(!n) return ''; const f=subjects().find(x=>x.name.toLowerCase()===n.toLowerCase()); if(f) return f.id;
+      const x={id:uid(),name:n.slice(0,60),term:'',color:SUBJ_COLORS[subjects().length%SUBJ_COLORS.length],closed:false,created:today()}; subjects().push(x); newSubj++; return x.id;};
     const regSheet=wb.Sheets['Registros']||wb.Sheets[wb.SheetNames[0]];
     XLSX.utils.sheet_to_json(regSheet,{defval:''}).forEach(r=>{
       const date=toDate(r.Fecha), cat=catFrom(r['Categoría']??r.Categoria), min=Math.round(Number(r.Minutos)||Number(r.Horas)*60||0);
       if(!date||!cat||!(min>0)){skipped++;return;}
       const id=String(r.ID||'').trim()||uid(); if(existing.has(id)){skipped++;return;}
       existing.add(id); const k=date.slice(0,7);
-      month(k).entries.push({id,date,start:toTime(r.Inicio),min,cat,mode:String(r.Modo||'manual'),note:String(r.Nota||'').slice(0,120)}); touched.add(k); added++;
+      month(k).entries.push({id,date,start:toTime(r.Inicio),min,cat,subj:CAT[cat].uni?subjFrom(r.Asignatura):'',mode:String(r.Modo||'manual'),note:String(r.Nota||'').slice(0,120)}); touched.add(k); added++;
     });
     if(wb.Sheets['Ánimo']) XLSX.utils.sheet_to_json(wb.Sheets['Ánimo'],{defval:''}).forEach(r=>{
       const date=toDate(r.Fecha), v=Math.round(Number(r['Ánimo (1-5)']??r.Animo)); if(!date||!(v>=1&&v<=5)) return;
       const k=date.slice(0,7); month(k).moods[date]={v,note:String(r.Nota||'').slice(0,300)}; touched.add(k); moodsN++;
     });
-    touched.forEach(markDirty); renderAll();
-    msg.innerHTML=`<div class="alert good">Importados ${added} registros y ${moodsN} días de ánimo.${skipped?` ${skipped} filas ignoradas (repetidas o incompletas).`:''}</div>`;
+    touched.forEach(markDirty); if(newSubj) markDirty('settings'); renderAll();
+    msg.innerHTML=`<div class="alert good">Importados ${added} registros y ${moodsN} días de ánimo.${newSubj?` Se han creado ${newSubj} asignaturas nuevas.`:''}${skipped?` ${skipped} filas ignoradas (repetidas o incompletas).`:''}</div>`;
   }catch(e){ console.warn(e); msg.innerHTML='<div class="alert bad">No se ha podido leer el archivo. ¿Es un .xlsx con una hoja «Registros»?</div>'; }
   ev.target.value='';
 });
@@ -876,16 +1054,17 @@ $('#importFile').addEventListener('change',async ev=>{
 /* ================= NAVEGACIÓN ================= */
 document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
-  ['hoy','stats','ajustes','excel'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==b.dataset.tab));
+  ['hoy','uni','stats','ajustes','excel'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==b.dataset.tab));
   if(b.dataset.tab==='ajustes') fillSettings();
   renderAll();
 });
 $('#rangeCtl').querySelectorAll('button').forEach(b=>b.onclick=()=>{range=+b.dataset.r;$('#rangeCtl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderStats();});
+$('#uniSubj').addEventListener('change',()=>{ if(!S.timer) setSelSubj($('#uniSubj').value); });
 $('#targetCtl').querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(S.timer) return; selTarget=+b.dataset.t; renderTimerCats(); });
 $('#timerBtn').onclick=()=>S.timer?stopTimer(true):startTimer();
 $('#timerCancel').onclick=()=>{ const t=S.timer; stopTimer(false); toast('Temporizador descartado',()=>{S.timer=t;markDirty('settings');renderAll();}); };
 
-function renderAll(){ renderTimerCats(); tickTimer(); renderToday(); renderGoals(); renderStats(); }
+function renderAll(){ renderTimerCats(); tickTimer(); renderToday(); renderGoals(); renderStats(); renderUni(); fillManualSubj(); }
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',renderAll);
 initManual(); fillSettings(); setAuthMode('login');
 setInterval(()=>{ if(user) tickTimer(); },1000);
