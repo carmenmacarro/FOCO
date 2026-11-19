@@ -9,3 +9,7 @@ window.FIREBASE_CONFIG = {
   messagingSenderId: "658416738345",
   appId: "1:658416738345:web:99f3cb8cbd65a2d9a37c38"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
