@@ -44,6 +44,7 @@ y entra en <http://localhost:8000> (`localhost` ya está autorizado en Firebase 
 - logo de FOCO más redondeado (Tipografia -> Fredoka)
 - apartado Universidad: asignaturas, clases/estudio/tareas y cierre de cuatrimestre
 - amigos (código de amistad y comparativa semanal), descanso ganado por metas, insignias y avatares
+- categoría Curioseo 🔭 (×1.25) para investigar ideas por tu cuenta y avatar de border collie
 
 > ⚠️ Desde que existe el apartado **Amigos**, las reglas de Firestore han cambiado. Cada vez que se modifique `firestore.rules`, copia su contenido en Firebase → **Firestore Database → Reglas** y pulsa **Publicar**.
 
