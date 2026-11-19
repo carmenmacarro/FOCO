@@ -40,5 +40,8 @@ y entra en <http://localhost:8000> (`localhost` ya está autorizado en Firebase 
 - `firebase-config.js` — la configuración de tu proyecto de Firebase.
 - `firestore.rules` — reglas de seguridad de la base de datos.
 
+## Cambios que ha realizado a mi petición:
+- logo de FOCO más redondeado (Tipografia -> Fredoka)
+
 ## Límites del plan gratuito de Firebase
 El plan Spark (gratis) permite 50.000 lecturas y 20.000 escrituras al día y 1 GB de datos: de sobra para decenas de personas usándolo a diario.
