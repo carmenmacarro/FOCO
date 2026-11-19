@@ -19,7 +19,7 @@
   --text:#0b0b0b; --text-2:#52514e; --muted:#8a8984;
   --accent:#2a78d6; --accent-soft:#e3eefb;
   --good:#0a7d33; --good-soft:#e2f4e8; --bad:#c43a39; --bad-soft:#fbe6e5; --warn:#a86a00; --warn-soft:#fdf1d8;
-  --c-estudio:#2a78d6; --c-tarea:#0e8fa8; --c-lectura:#1baf7a; --c-manual:#eda100; --c-clase:#6250d6;
+  --c-estudio:#2a78d6; --c-tarea:#0e8fa8; --c-lectura:#1baf7a; --c-curioseo:#d6457f; --c-manual:#eda100; --c-clase:#6250d6;
   --c-series:#eb6834; --c-scroll:#e34948; --c-otro:#9b9a94;
   --radius:14px; --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
 }
@@ -30,7 +30,7 @@
     --text:#f0efec; --text-2:#c3c2b7; --muted:#8d8c85;
     --accent:#3987e5; --accent-soft:#1d2b3d;
     --good:#3fbf6a; --good-soft:#16301f; --bad:#e66767; --bad-soft:#3a1d1d; --warn:#e0a63a; --warn-soft:#352914;
-    --c-estudio:#3987e5; --c-tarea:#26a9c2; --c-lectura:#199e70; --c-manual:#c98500; --c-clase:#9085e9;
+    --c-estudio:#3987e5; --c-tarea:#26a9c2; --c-lectura:#199e70; --c-curioseo:#e0628f; --c-manual:#c98500; --c-clase:#9085e9;
     --c-series:#d95926; --c-scroll:#e66767; --c-otro:#7a7973;
     --shadow:none;
   }
@@ -186,6 +186,8 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
 .badge b{display:block;font-size:13px}
 .badge small{display:block;font-size:11.5px;color:var(--muted)}
 .badge.off{opacity:.5;filter:grayscale(1)}
+.av-img{display:inline-block;width:1.3em;height:1.3em;vertical-align:-.28em;line-height:0}
+.av-img svg{width:100%;height:100%;display:block}
 .avatar{width:56px;height:56px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:32px;flex:none}
 .avatar.sm{width:38px;height:38px;font-size:21px}
 .avatars{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
@@ -541,6 +543,7 @@ const CATS = [
   {id:'estudio', name:'Estudio',           icon:'📚', uni:true},
   {id:'tarea',   name:'Tareas',            icon:'📝', uni:true},
   {id:'lectura', name:'Lectura',           icon:'📖'},
+  {id:'curioseo',name:'Curioseo',          icon:'🔭', desc:'investigar por tu cuenta ideas que te interesan'},
   {id:'manual',  name:'Hobbies manuales',  icon:'🧶'},
   {id:'series',  name:'Series',            icon:'📺', neg:true},
   {id:'scroll',  name:'Scroll / RRSS',     icon:'📱', neg:true},
@@ -551,7 +554,7 @@ const UNI = CATS.filter(c=>c.uni);
 const SUBJ_COLORS = ['#2a78d6','#6250d6','#1baf7a','#eda100','#eb6834','#d6457f','#0e8fa8','#8a6a4a'];
 const DEFAULTS = {
   basePts:10,
-  mult:{estudio:2, tarea:2, clase:1, lectura:1, manual:1, otro:0},
+  mult:{estudio:2, tarea:2, clase:1, lectura:1, curioseo:1.25, manual:1, otro:0},
   free:30, block:60, blockPts:15,
   dailyPts:40, weekStudy:15, weekScreen:7, weekPts:250,
   subjects:[],
@@ -561,6 +564,8 @@ const DEFAULTS = {
 };
 const AVATARS=[['🙂',1],['🐱',1],['🐶',1],['🦊',1],['🐼',1],['🐸',1],['🦉',2],['🐨',3],['🐯',4],['🐧',5],['🦄',6],['🐙',8],['🦋',10],['🐉',12],['👑',15]];
 const TITLES=[[1,'Semilla 🌱'],[3,'Brote 🌿'],[5,'Árbol 🌳'],[8,'Bosque 🌲'],[12,'Leyenda ✨']];
+const AV_SVG={'🐶':'<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g fill="#ffffff" stroke="#cfccc4" stroke-width="1"><circle cx="15" cy="54" r="7"/><circle cx="49" cy="54" r="7"/><circle cx="24" cy="51" r="7"/><circle cx="40" cy="51" r="7"/><rect x="8" y="54" width="48" height="12"/></g><g fill="#ffffff"><circle cx="15" cy="54" r="6.4"/><circle cx="49" cy="54" r="6.4"/><circle cx="24" cy="51" r="6.4"/><circle cx="40" cy="51" r="6.4"/><circle cx="32" cy="50" r="7"/><rect x="8.6" y="54" width="46.8" height="12"/></g><path d="M12 26 C9 16 12 8 20 6 C23 9 24 13 24 17 C22 15 18 15 16 18 Z" fill="#1d1d1f" stroke="#55555a" stroke-width=".8"/><path d="M20 6 C16 8 13 13 14 18 C16 15 19 14 22 15 C22 11 21 8 20 6 Z" fill="#2c2c2e"/><path d="M52 26 C55 16 52 8 44 6 C41 9 40 13 40 17 C42 15 46 15 48 18 Z" fill="#1d1d1f" stroke="#55555a" stroke-width=".8"/><path d="M44 6 C48 8 51 13 50 18 C48 15 45 14 42 15 C42 11 43 8 44 6 Z" fill="#2c2c2e"/><path d="M32 12 C20 12 13 20 13 31 C13 40 18 46 24 49 L40 49 C46 46 51 40 51 31 C51 20 44 12 32 12 Z" fill="#1d1d1f" stroke="#55555a" stroke-width=".8"/><path d="M32 13 C30.5 13 30 15 30 18 L29 30 C24 33 21 38 22 43 C23 49 28 52 32 52 C36 52 41 49 42 43 C43 38 40 33 35 30 L34 18 C34 15 33.5 13 32 13 Z" fill="#ffffff"/><ellipse cx="23" cy="30" rx="3" ry="3.3" fill="#4a2c17"/><ellipse cx="41" cy="30" rx="3" ry="3.3" fill="#4a2c17"/><circle cx="24" cy="29" r="1.1" fill="#fff"/><circle cx="42" cy="29" r="1.1" fill="#fff"/><path d="M28.6 40.5 C28.6 38.6 35.4 38.6 35.4 40.5 C35.4 42.8 33.4 44.2 32 44.2 C30.6 44.2 28.6 42.8 28.6 40.5 Z" fill="#1d1d1f"/><path d="M32 44.2 L32 46.5 M32 46.5 C30.2 48.4 27.8 48 27.2 46.6 M32 46.5 C33.8 48.4 36.2 48 36.8 46.6" stroke="#1d1d1f" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>'};
+const avHtml=a=>AV_SVG[a]?`<span class="av-img" role="img" aria-label="Border collie">${AV_SVG[a]}</span>`:esc(a||'🙂');
 const titleFor=l=>TITLES.filter(t=>l>=t[0]).at(-1)[1];
 const levelFor=pts=>Math.max(1,Math.floor(pts/200)+1);
 const BADGES=[
@@ -575,6 +580,7 @@ const BADGES=[
   {id:'uni50', ic:'🎓', n:'50 h de uni', d:'50 horas de universidad', ok:P=>P.uniMin>=3000},
   {id:'uni150', ic:'🧠', n:'150 h de uni', d:'150 horas de universidad', ok:P=>P.uniMin>=9000},
   {id:'lect10', ic:'📖', n:'Lectura', d:'10 horas leyendo', ok:P=>P.lectMin>=600},
+  {id:'curio10', ic:'🔭', n:'Mente curiosa', d:'10 horas de curioseo', ok:P=>P.curioMin>=600},
   {id:'manual10', ic:'🧶', n:'Manitas', d:'10 horas de hobbies manuales', ok:P=>P.manualMin>=600},
   {id:'semana', ic:'💎', n:'Semana perfecta', d:'Cumple los 3 objetivos de una semana', ok:P=>P.weeksPerfect>=1},
   {id:'detox', ic:'🧘', n:'Detox', d:'Una semana sin pasarte de pantallas', ok:P=>P.detox>=1},
@@ -845,7 +851,7 @@ function tickTimer(){
   if(!t){
     $('#timerFace').textContent='00:00:00';
     const c=CAT[selCat];
-    $('#timerSub').textContent=c.neg?`Cuenta para la penalización (${s.free} min libres al día)`:`${(s.mult[selCat]||0)*s.basePts} pts por hora`;
+    $('#timerSub').textContent=c.neg?`Cuenta para la penalización (${s.free} min libres al día)`:`${(s.mult[selCat]||0)*s.basePts} pts por hora${c.desc?' · '+c.desc:''}`;
     $('#timerAlert').innerHTML=''; document.title='FOCO · Organiza tu día'; return;
   }
   const ms=Date.now()-t.start, sec=Math.floor(ms/1000);
@@ -890,7 +896,7 @@ function renderToday(){
   $('#streak').innerHTML=html;
   // nivel
   const P=progress();
-  $('#levelBadge').textContent=`${S.settings.profile.avatar} Nivel ${P.level} · ${Math.round(P.totalPts)} pts`;
+  $('#levelBadge').innerHTML=`${avHtml(S.settings.profile.avatar)} Nivel ${P.level} · ${Math.round(P.totalPts)} pts`;
   renderRestBox(P);
   renderTimeline(); renderEntries(); renderMood();
 }
@@ -1130,7 +1136,7 @@ function progress(){
   const sumCat=ids=>ents.reduce((a,e)=>a+(ids.includes(e.cat)?e.min:0),0);
   const P={key,totalPts,level:levelFor(totalPts),streak,bestStreak:best,daysHit:hit.size,weeksPerfect,detox,
     earned,spent,balance:Math.max(0,earned-spent),log:log.concat(used).sort((a,b)=>b.date.localeCompare(a.date)),
-    entries:ents.length,uniMin:sumCat(UNI.map(c=>c.id)),lectMin:sumCat(['lectura']),manualMin:sumCat(['manual']),
+    entries:ents.length,uniMin:sumCat(UNI.map(c=>c.id)),lectMin:sumCat(['lectura']),curioMin:sumCat(['curioseo']),manualMin:sumCat(['manual']),
     closedTerms:subjects().filter(x=>x.closed).length,moodDays:Object.values(S.months).reduce((a,m)=>a+Object.keys(m.moods||{}).length,0),
     friends:(s.friends||[]).filter(f=>friendData[f.uid]).length, week:weekSummary(curWs)};
   P.badges=BADGES.filter(b=>b.ok(P)).map(b=>b.id);
@@ -1273,12 +1279,12 @@ function renderAmigos(){
   const P=progress(), pr=S.settings.profile;
   $('#socialAlert').innerHTML=socialErr==='rules'?'<div class="alert warn" style="margin:0 0 16px">Para usar Amigos hay que actualizar las reglas de Firestore en la consola de Firebase (están en el archivo <b>firestore.rules</b> y en el README).</div>':socialErr==='net'?'<div class="alert warn" style="margin:0 0 16px">No se ha podido conectar con la nube. Se reintentará.</div>':'';
   $('#profTitle').textContent=`Nivel ${P.level} · ${titleFor(P.level)}`;
-  $('#profAvatar').textContent=pr.avatar;
+  $('#profAvatar').innerHTML=avHtml(pr.avatar);
   if(document.activeElement!==$('#profName')) $('#profName').value=pr.name||'';
-  $('#profAvatars').innerHTML=AVATARS.map(([a,l])=>`<button class="av ${pr.avatar===a?'on':''}" data-av="${a}" ${P.level<l?'disabled':''} title="${P.level<l?'Se desbloquea en el nivel '+l:a}">${a}${P.level<l?`<small>N${l}</small>`:''}</button>`).join('');
+  $('#profAvatars').innerHTML=AVATARS.map(([a,l])=>`<button class="av ${pr.avatar===a?'on':''}" data-av="${a}" ${P.level<l?'disabled':''} title="${P.level<l?'Se desbloquea en el nivel '+l:a==='🐶'?'Border collie':a}">${avHtml(a)}${P.level<l?`<small>N${l}</small>`:''}</button>`).join('');
   $('#profAvatars').querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{ pr.avatar=b.dataset.av; markDirty('settings'); renderAll(); });
   $('#myCode').textContent=pr.code||'······';
-  $('#reqIn').innerHTML=incoming.length?'<div class="small muted">Solicitudes recibidas</div>'+incoming.map(r=>`<div class="req"><span class="avatar sm">${esc(r.avatar||'🙂')}</span><span class="grow"><b>${esc(r.name||'Alguien')}</b><br><span class="small muted">quiere comparar objetivos contigo</span></span><button class="btn sm primary" data-acc="${esc(r.from)}">Aceptar</button><button class="btn sm" data-rej="${esc(r.from)}">Rechazar</button></div>`).join(''):'';
+  $('#reqIn').innerHTML=incoming.length?'<div class="small muted">Solicitudes recibidas</div>'+incoming.map(r=>`<div class="req"><span class="avatar sm">${avHtml(r.avatar)}</span><span class="grow"><b>${esc(r.name||'Alguien')}</b><br><span class="small muted">quiere comparar objetivos contigo</span></span><button class="btn sm primary" data-acc="${esc(r.from)}">Aceptar</button><button class="btn sm" data-rej="${esc(r.from)}">Rechazar</button></div>`).join(''):'';
   $('#reqIn').querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>acceptReq(incoming.find(r=>r.from===b.dataset.acc)));
   $('#reqIn').querySelectorAll('[data-rej]').forEach(b=>b.onclick=()=>rejectReq(incoming.find(r=>r.from===b.dataset.rej)));
   // ranking
@@ -1291,7 +1297,7 @@ function renderAmigos(){
   people.sort((a,b)=>val(b)-val(a));
   const pend=(S.settings.friends||[]).filter(f=>friendState[f.uid]!=='ok');
   $('#ranking').innerHTML=people.map((x,i)=>{const [v,l]=show(x), cur=x.week?.ws===ws;
-    return `<div class="friend ${x.me?'me':''}"><span class="rk">${['🥇','🥈','🥉'][i]||i+1}</span><span class="avatar sm">${esc(x.avatar||'🙂')}</span>
+    return `<div class="friend ${x.me?'me':''}"><span class="rk">${['🥇','🥈','🥉'][i]||i+1}</span><span class="avatar sm">${avHtml(x.avatar)}</span>
       <span class="nm"><b>${esc(x.name||'Sin nombre')}${x.me?' (tú)':''}</b><small>Nivel ${x.level||1} · ${esc(x.title||titleFor(x.level||1))}</small></span>
       <span class="val">${v}<small>${l}</small></span>${goalBars(x.week,cur)}
       <span class="bdg">${(x.badges||[]).map(id=>BADGES.find(b=>b.id===id)?.ic||'').join('')}${x.me?'':` <button class="x" data-rm="${esc(x.uid)}" title="Quitar amigo/a" style="float:right">✕</button>`}</span></div>`}).join('')
