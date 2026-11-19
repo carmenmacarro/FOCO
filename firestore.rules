@@ -1,9 +1,26 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Cada persona solo puede leer y escribir sus propios datos.
+    // Datos privados: cada persona solo puede leer y escribir los suyos.
     match /users/{userId}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    // Resumen público del perfil: solo lo ven su dueño y los amigos que el dueño ha aceptado.
+    match /profiles/{userId} {
+      allow write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null
+        && (request.auth.uid == userId || request.auth.uid in resource.data.friends);
+    }
+    // Códigos de amistad: cualquiera con sesión puede buscar un código; solo se crean, no se cambian.
+    match /codes/{code} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+    }
+    // Solicitudes de amistad: las envía quien las firma; las ve y borra quien las recibe (o quien las envió).
+    match /requests/{to}/in/{from} {
+      allow create, update: if request.auth != null && request.auth.uid == from;
+      allow read, delete: if request.auth != null
+        && (request.auth.uid == to || request.auth.uid == from);
     }
   }
 }
