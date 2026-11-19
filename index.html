@@ -174,6 +174,42 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
 .subj .mini{display:flex;height:6px;border-radius:999px;overflow:hidden;background:var(--surface-2);width:120px}
 .subj .acts{margin-left:auto;display:flex;gap:4px}
 .subj .mini i{display:block;height:100%}
+.rest-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding:10px 12px;border-radius:12px;background:var(--good-soft);color:var(--good);font-size:13.5px}
+.rest-box b{font-variant-numeric:tabular-nums}
+.rest-box .grow{flex:1}
+.rest-box .btn{border-color:transparent}
+.rest-opts{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.big-num{font-size:40px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.badge{border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;min-width:0}
+.badge .ic{font-size:26px;line-height:1}
+.badge b{display:block;font-size:13px}
+.badge small{display:block;font-size:11.5px;color:var(--muted)}
+.badge.off{opacity:.5;filter:grayscale(1)}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:32px;flex:none}
+.avatar.sm{width:38px;height:38px;font-size:21px}
+.avatars{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.av{width:40px;height:40px;border-radius:50%;border:2px solid transparent;background:var(--surface-2);font-size:22px;cursor:pointer;position:relative;padding:0}
+.av.on{border-color:var(--text)}
+.av:disabled{cursor:not-allowed;filter:grayscale(1);opacity:.45}
+.av small{position:absolute;bottom:-4px;right:-6px;font-size:9px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0 3px;color:var(--text-2)}
+.code{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;letter-spacing:.12em}
+.friend{display:grid;grid-template-columns:22px 38px 1fr auto;gap:4px 10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.friend:last-child{border-bottom:0}
+.friend.me{background:var(--accent-soft);margin:0 -10px;padding:12px 10px;border-radius:12px;border-bottom:0}
+.friend .rk{font-weight:700;color:var(--muted);text-align:center}
+.friend .nm{min-width:0}
+.friend .nm b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.friend .nm small{color:var(--muted);font-size:12px}
+.friend .val{font-size:20px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.friend .val small{display:block;font-size:11px;font-weight:400;color:var(--muted)}
+.friend .goals{grid-column:3/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11.5px;color:var(--text-2)}
+.friend .goals .bar{height:6px;margin:3px 0 0}
+.friend .bdg{grid-column:3/-1;font-size:15px;letter-spacing:2px}
+@media (max-width:600px){.friend .goals{grid-template-columns:1fr}}
+.req{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border)}
+.req:last-child{border-bottom:0}
+.req .grow{flex:1;min-width:0}
 .user{font-size:13px;color:var(--text-2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
@@ -212,6 +248,8 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
   <nav class="tabs" role="tablist">
     <button class="on" data-tab="hoy">Hoy</button>
     <button data-tab="uni">Universidad</button>
+    <button data-tab="amigos">Amigos</button>
+    <button data-tab="logros">Logros</button>
     <button data-tab="stats">Estadísticas</button>
     <button data-tab="ajustes">Objetivos y ajustes</button>
     <button data-tab="excel">Excel</button>
@@ -252,6 +290,11 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
         <div id="todayBreak" style="margin-top:10px"></div>
         <div class="small muted" style="margin-top:10px">Racha de objetivo diario (últimos 14 días)</div>
         <div class="streak" id="streak"></div>
+        <div class="rest-box" id="restBox">
+          <span class="grow">🛋️ Descanso ganado: <b id="restBal">0 min</b><span id="restToday"></span></span>
+          <button class="btn sm" id="restBtn" type="button">Canjear</button>
+          <div class="rest-opts hidden" id="restOpts"></div>
+        </div>
       </div>
     </div>
 
@@ -317,6 +360,76 @@ th{color:var(--text-2);font-weight:600;font-size:12px}
     <div class="card" style="margin-top:16px">
       <h2>Cuatrimestres cerrados <small>historial</small></h2>
       <div id="uniClosed"></div>
+    </div>
+  </section>
+
+  <!-- ============ AMIGOS ============ -->
+  <section id="tab-amigos" class="hidden">
+    <div id="socialAlert"></div>
+    <div class="grid g2">
+      <div class="card">
+        <h2>Tu perfil <small id="profTitle"></small></h2>
+        <div class="row" style="gap:14px;flex-wrap:nowrap">
+          <div class="avatar" id="profAvatar">🙂</div>
+          <label class="f" style="flex:1">Nombre visible<input type="text" id="profName" maxlength="30" placeholder="¿Cómo te verán tus amigos?"></label>
+        </div>
+        <div class="small muted" style="margin-top:12px">Avatar · se desbloquean más al subir de nivel</div>
+        <div class="avatars" id="profAvatars"></div>
+      </div>
+      <div class="card">
+        <h2>Añadir amigos</h2>
+        <div class="small muted">Tu código de amistad</div>
+        <div class="row" style="justify-content:space-between;margin:4px 0 12px"><span class="code" id="myCode">······</span>
+          <span class="row"><button class="btn sm" id="copyCode">Copiar código</button><button class="btn sm" id="copyLink">Copiar enlace</button></span></div>
+        <form id="addFriendForm" class="row" style="flex-wrap:nowrap">
+          <input type="text" id="friendCode" maxlength="8" placeholder="Código de tu amigo/a" style="text-transform:uppercase" autocomplete="off">
+          <button class="btn primary" type="submit">Añadir</button>
+        </form>
+        <div id="friendMsg"></div>
+        <div id="reqIn" style="margin-top:12px"></div>
+        <p class="small muted" style="margin:12px 0 0">Tus amigos solo ven tu resumen: nombre, avatar, nivel, racha, insignias y cómo vas con tus objetivos de la semana. Nunca tus registros, notas, asignaturas ni tu ánimo.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Comparativa de la semana <small id="weekLbl"></small></h2>
+      <div class="row" style="justify-content:space-between;margin-bottom:6px">
+        <div class="seg-ctl" id="rankCtl">
+          <button data-m="pts" class="on">Puntos</button>
+          <button data-m="uni">Universidad</button>
+          <button data-m="goals">Objetivos</button>
+          <button data-m="streak">Racha</button>
+        </div>
+        <button class="btn sm" id="refreshFriends">Actualizar</button>
+      </div>
+      <div id="ranking"></div>
+    </div>
+  </section>
+
+  <!-- ============ LOGROS ============ -->
+  <section id="tab-logros" class="hidden">
+    <div class="grid g2">
+      <div class="card">
+        <h2>Descanso ganado <small>tu hucha de tiempo libre</small></h2>
+        <div class="big-num" id="restBig">0 min</div>
+        <div class="small muted" id="restSum"></div>
+        <p class="small" style="margin:12px 0">Cada meta que cumples suma minutos de descanso. Cuando los canjeas, ese día se suman a tus minutos libres de pantalla: puedes ver series o hacer scroll ese rato <b>sin perder puntos</b>.</p>
+        <div class="rest-opts" id="restOpts2"></div>
+        <div class="small muted" style="margin-top:14px">Últimos movimientos</div>
+        <div class="list" id="restLog"></div>
+      </div>
+      <div class="card">
+        <h2>Recompensas por meta <small>minutos de descanso</small></h2>
+        <div class="setrow"><span>🎯 Objetivo diario de puntos</span><input type="number" min="0" id="rwDaily"></div>
+        <div class="setrow"><span>🏛️ Objetivo semanal de universidad</span><input type="number" min="0" id="rwWeekStudy"></div>
+        <div class="setrow"><span>⭐ Objetivo semanal de puntos</span><input type="number" min="0" id="rwWeekPts"></div>
+        <div class="setrow"><span>🧘 Semana sin pasarte de pantallas</span><input type="number" min="0" id="rwWeekScreen"></div>
+        <div class="row" style="margin-top:12px"><button class="btn primary" id="saveRewards">Guardar</button></div>
+        <p class="small muted" style="margin:10px 0 0">Los objetivos de la semana se premian en cuanto los alcanzas; el de pantallas, al terminar la semana (lunes a domingo).</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Insignias <small id="badgeCount"></small></h2>
+      <div class="badges" id="badgeGrid"></div>
     </div>
   </section>
 
@@ -441,8 +554,35 @@ const DEFAULTS = {
   mult:{estudio:2, tarea:2, clase:1, lectura:1, manual:1, otro:0},
   free:30, block:60, blockPts:15,
   dailyPts:40, weekStudy:15, weekScreen:7, weekPts:250,
-  subjects:[]
+  subjects:[],
+  rewards:{daily:30, weekStudy:120, weekPts:60, weekScreen:60},
+  profile:{name:'', avatar:'🙂', code:''},
+  friends:[]
 };
+const AVATARS=[['🙂',1],['🐱',1],['🐶',1],['🦊',1],['🐼',1],['🐸',1],['🦉',2],['🐨',3],['🐯',4],['🐧',5],['🦄',6],['🐙',8],['🦋',10],['🐉',12],['👑',15]];
+const TITLES=[[1,'Semilla 🌱'],[3,'Brote 🌿'],[5,'Árbol 🌳'],[8,'Bosque 🌲'],[12,'Leyenda ✨']];
+const titleFor=l=>TITLES.filter(t=>l>=t[0]).at(-1)[1];
+const levelFor=pts=>Math.max(1,Math.floor(pts/200)+1);
+const BADGES=[
+  {id:'primer', ic:'🌱', n:'Primer paso', d:'Registra tu primera actividad', ok:P=>P.entries>=1},
+  {id:'dia1', ic:'🎯', n:'¡Objetivo!', d:'Cumple el objetivo diario', ok:P=>P.daysHit>=1},
+  {id:'dia10', ic:'🏅', n:'10 días', d:'Cumple el objetivo 10 días', ok:P=>P.daysHit>=10},
+  {id:'dia30', ic:'🏆', n:'30 días', d:'Cumple el objetivo 30 días', ok:P=>P.daysHit>=30},
+  {id:'racha3', ic:'🔥', n:'Racha de 3', d:'3 días seguidos cumpliendo', ok:P=>P.bestStreak>=3},
+  {id:'racha7', ic:'⚡', n:'Racha de 7', d:'Una semana entera seguida', ok:P=>P.bestStreak>=7},
+  {id:'racha21', ic:'🌟', n:'Racha de 21', d:'21 días seguidos', ok:P=>P.bestStreak>=21},
+  {id:'uni10', ic:'📚', n:'10 h de uni', d:'10 horas de universidad', ok:P=>P.uniMin>=600},
+  {id:'uni50', ic:'🎓', n:'50 h de uni', d:'50 horas de universidad', ok:P=>P.uniMin>=3000},
+  {id:'uni150', ic:'🧠', n:'150 h de uni', d:'150 horas de universidad', ok:P=>P.uniMin>=9000},
+  {id:'lect10', ic:'📖', n:'Lectura', d:'10 horas leyendo', ok:P=>P.lectMin>=600},
+  {id:'manual10', ic:'🧶', n:'Manitas', d:'10 horas de hobbies manuales', ok:P=>P.manualMin>=600},
+  {id:'semana', ic:'💎', n:'Semana perfecta', d:'Cumple los 3 objetivos de una semana', ok:P=>P.weeksPerfect>=1},
+  {id:'detox', ic:'🧘', n:'Detox', d:'Una semana sin pasarte de pantallas', ok:P=>P.detox>=1},
+  {id:'cuatri', ic:'🏛️', n:'Cuatri cerrado', d:'Cierra un cuatrimestre', ok:P=>P.closedTerms>=1},
+  {id:'animo7', ic:'💜', n:'Diario', d:'Registra tu ánimo 7 días', ok:P=>P.moodDays>=7},
+  {id:'nivel5', ic:'🚀', n:'Nivel 5', d:'Llega al nivel 5', ok:P=>P.level>=5},
+  {id:'amigo', ic:'🤝', n:'En equipo', d:'Conecta con un amigo/a', ok:P=>P.friends>=1},
+];
 const MOODS = [{v:1,e:'😞',t:'Fatal'},{v:2,e:'😕',t:'Regular'},{v:3,e:'😐',t:'Normal'},{v:4,e:'🙂',t:'Bien'},{v:5,e:'😄',t:'Genial'}];
 
 let S = { settings: structuredClone(DEFAULTS), timer:null, months:{} };
@@ -466,7 +606,8 @@ const fmtDay = s=>{const d=parseYmd(s);return `${DOW[d.getDay()]} ${d.getDate()}
 function weekStart(s){const d=parseYmd(s);const dow=(d.getDay()+6)%7;d.setDate(d.getDate()-dow);return ymd(d)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
-function month(key){ if(!S.months[key]) S.months[key]={entries:[],moods:{}}; return S.months[key]; }
+function month(key){ if(!S.months[key]) S.months[key]={entries:[],moods:{},rest:{}}; S.months[key].rest||={}; return S.months[key]; }
+const restOn = date=>S.months[date.slice(0,7)]?.rest?.[date]||0;
 const allEntries = ()=>Object.values(S.months).flatMap(m=>m.entries);
 const entriesOn = date=>(S.months[date.slice(0,7)]?.entries||[]).filter(e=>e.date===date);
 const moodOn = date=>S.months[date.slice(0,7)]?.moods?.[date];
@@ -483,28 +624,28 @@ function dayStats(date, extra){ // extra: {cat,min} para el temporizador en marc
   const list=entriesOn(date).slice(); if(extra) list.push(extra);
   let pos=0;
   list.forEach(e=>{by[e.cat]=(by[e.cat]||0)+e.min; pos+=entryPts(e)});
-  const screen=by.series+by.scroll;
-  const blocks=Math.floor(Math.max(0,screen-s.free)/s.block);
+  const screen=by.series+by.scroll, free=s.free+restOn(date);
+  const blocks=Math.floor(Math.max(0,screen-free)/s.block);
   const penalty=blocks*s.blockPts;
-  return {by,pos,screen,blocks,penalty,net:pos-penalty};
+  return {by,pos,screen,free,blocks,penalty,net:pos-penalty};
 }
 function liveExtra(){ const t=S.timer; if(!t||ymd(new Date(t.start))!==today()) return null; return {cat:t.cat,min:(Date.now()-t.start)/60000}; }
 function totalPoints(){ const days=new Set(allEntries().map(e=>e.date)); let t=0; days.forEach(d=>t+=dayStats(d).net); return t; }
 
 /* ================= PERSISTENCIA (Firebase) ================= */
 // Cada usuario tiene sus datos en users/{uid}/data/{settings | m-YYYY-MM}
-let fs=null, user=null, unsub=null, dirty=new Set(), inflight=0, flushTimer=null, firstSnap=true;
+let dataVer=0, fs=null, user=null, unsub=null, dirty=new Set(), inflight=0, flushTimer=null, firstSnap=true;
 const lsKey=()=>'foco-v1-'+(user?user.uid:'anon');
 function saveLocal(){ try{localStorage.setItem(lsKey(),JSON.stringify(S))}catch(e){} }
 function loadLocal(){
   S={ settings: structuredClone(DEFAULTS), timer:null, months:{} };
-  try{const raw=localStorage.getItem(lsKey()); if(raw){const o=JSON.parse(raw); S.settings={...structuredClone(DEFAULTS),...o.settings,mult:{...DEFAULTS.mult,...(o.settings?.mult||{})}}; S.timer=o.timer||null; S.months=o.months||{};}}catch(e){}
+  try{const raw=localStorage.getItem(lsKey()); if(raw){const o=JSON.parse(raw); S.settings={...structuredClone(DEFAULTS),...o.settings,mult:{...DEFAULTS.mult,...(o.settings?.mult||{})},rewards:{...DEFAULTS.rewards,...(o.settings?.rewards||{})},profile:{...DEFAULTS.profile,...(o.settings?.profile||{})}}; S.timer=o.timer||null; S.months=o.months||{};}}catch(e){}
 }
 function setSync(cls,txt){ const el=$('#sync'); el.className='sync '+cls; el.querySelector('span').textContent=txt; }
 const userCol=()=>fs.collection('users').doc(user.uid).collection('data');
 
 function markDirty(key){ // key: 'settings' o 'YYYY-MM'
-  saveLocal();
+  dataVer++; saveLocal(); schedulePublish();
   if(!user) return;
   dirty.add(key); setSync('warn','Guardando…');
   clearTimeout(flushTimer); flushTimer=setTimeout(flush,700);
@@ -516,7 +657,7 @@ async function flush(){
     inflight++;
     try{
       const ref=userCol().doc(k==='settings'?'settings':'m-'+k);
-      const body = k==='settings' ? {settings:S.settings,timer:S.timer||null} : {entries:month(k).entries,moods:month(k).moods};
+      const body = k==='settings' ? {settings:S.settings,timer:S.timer||null} : {entries:month(k).entries,moods:month(k).moods,rest:month(k).rest||{}};
       await ref.set(JSON.parse(JSON.stringify(body)));
     }catch(e){
       if(e?.code==='unavailable'){ dirty.add(k); }
@@ -531,14 +672,16 @@ function applySnap(snap){
     firstSnap=false;
     if(snap.empty){ // cuenta nueva: sube lo que hubiera en este navegador
       markDirty('settings'); Object.keys(S.months).forEach(markDirty);
+      socialStart();
       return;
     }
   }
   const months={}; let settings=null, timer=null;
-  snap.docs.forEach(d=>{const v=d.data(); if(d.id==='settings'){settings=v.settings;timer=v.timer||null} else if(d.id.startsWith('m-')) months[d.id.slice(2)]={entries:v.entries||[],moods:v.moods||{}}});
-  if(settings) S.settings={...structuredClone(DEFAULTS),...settings,mult:{...DEFAULTS.mult,...(settings.mult||{})}};
-  S.timer=timer; S.months=months;
+  snap.docs.forEach(d=>{const v=d.data(); if(d.id==='settings'){settings=v.settings;timer=v.timer||null} else if(d.id.startsWith('m-')) months[d.id.slice(2)]={entries:v.entries||[],moods:v.moods||{},rest:v.rest||{}}});
+  if(settings) S.settings={...structuredClone(DEFAULTS),...settings,mult:{...DEFAULTS.mult,...(settings.mult||{})},rewards:{...DEFAULTS.rewards,...(settings.rewards||{})},profile:{...DEFAULTS.profile,...(settings.profile||{})}};
+  S.timer=timer; S.months=months; dataVer++;
   saveLocal(); fillSettings(); renderAll();
+  socialStart(); schedulePublish();
   if(!snap.metadata.fromCache) setSync('ok','Guardado en la nube');
 }
 function startSync(){
@@ -551,7 +694,7 @@ function startSync(){
     applySnap(snap);
   },err=>{ clearTimeout(t); console.warn(err); setSync('warn','Error de conexión con la nube'); });
 }
-function stopSync(){ if(unsub){unsub();unsub=null;} clearTimeout(flushTimer); dirty.clear(); }
+function stopSync(){ if(unsub){unsub();unsub=null;} clearTimeout(flushTimer); dirty.clear(); socialStop(); }
 
 /* ================= CUENTAS ================= */
 const AUTH_ERR={
@@ -598,8 +741,8 @@ function initAuth(){
     $('#authSubmit').disabled=true;
     try{
       if(authMode==='signup'){
-        const cred=await auth.createUserWithEmailAndPassword(email,pass);
-        const name=$('#authName').value.trim(); if(name) await cred.user.updateProfile({displayName:name});
+        const name=$('#authName').value.trim(); signupName=name;
+        const cred=await auth.createUserWithEmailAndPassword(email,pass); if(name) await cred.user.updateProfile({displayName:name});
         renderUser();
       } else await auth.signInWithEmailAndPassword(email,pass);
     }catch(e){ authAlert('bad',authMsg(e)); }
@@ -624,7 +767,7 @@ function initAuth(){
     $('#authScreen').classList.toggle('hidden',!!u);
     $('#app').classList.toggle('hidden',!u);
     if(u){ renderUser(); startSync(); }
-    else { $('#authPass').value=''; setAuthMode('login'); }
+    else { $('#authPass').value=''; setAuthMode('login'); document.querySelector('nav.tabs [data-tab=hoy]').click(); }
   });
 }
 function renderUser(){ if(user) $('#userName').textContent=user.displayName||user.email||''; }
@@ -714,7 +857,7 @@ function tickTimer(){
   if(c.neg){
     const st=dayStats(today(),liveExtra());
     $('#timerSub').textContent=`${c.icon} ${c.name} · pantallas hoy: ${fmtH(st.screen)}`;
-    const toNext = s.free + (st.blocks+1)*s.block - st.screen;
+    const toNext = st.free + (st.blocks+1)*s.block - st.screen;
     if(st.penalty>0) alert=`<div class="alert bad">Llevas ${fmtH(st.screen)} de pantallas hoy: <b>−${st.penalty} pts</b>. Siguiente −${s.blockPts} en ${Math.ceil(toNext)} min. ¿Lo dejas aquí y te pones con algo?</div>`;
     else if(toNext<=15) alert=`<div class="alert warn">En ${Math.ceil(toNext)} min empiezas a perder puntos (−${s.blockPts}).</div>`;
   } else {
@@ -738,7 +881,7 @@ function renderToday(){
   $('#todayBar').firstElementChild.style.width=pct+'%';
   $('#goalSmall').textContent=st.net>=s.dailyPts?'¡objetivo cumplido! 🎉':`faltan ${Math.ceil(s.dailyPts-st.net)} pts`;
   let rows=CATS.filter(c=>!c.neg&&st.by[c.id]>0).map(c=>`<div class="kv"><span>${c.icon} ${c.name} · ${fmtH(st.by[c.id])} <span class="muted small">×${s.mult[c.id]||0}</span></span><span class="pos">${fmtPts(entryPts({cat:c.id,min:st.by[c.id]}))}</span></div>`).join('');
-  if(st.screen>0) rows+=`<div class="kv"><span>📺📱 Pantallas · ${fmtH(st.screen)} <span class="muted small">(${s.free} min libres)</span></span><span class="${st.penalty?'neg':'muted'}">${st.penalty?'−'+st.penalty:'0'}</span></div>`;
+  if(st.screen>0) rows+=`<div class="kv"><span>📺📱 Pantallas · ${fmtH(st.screen)} <span class="muted small">(${st.free} min libres${restOn(d)?` · ${restOn(d)} de descanso`:''})</span></span><span class="${st.penalty?'neg':'muted'}">${st.penalty?'−'+st.penalty:'0'}</span></div>`;
   $('#todayBreak').innerHTML=rows||'<div class="muted small">Aún no hay nada registrado hoy. Empieza un temporizador 👆</div>';
   // racha
   let html='';
@@ -746,8 +889,9 @@ function renderToday(){
     html+=`<i class="${hit?'hit':''} ${i===0?'today':''}" title="${fmtDay(day)}: ${Math.round(n)} pts">${DOW[parseYmd(day).getDay()]}</i>`; }
   $('#streak').innerHTML=html;
   // nivel
-  const tot=totalPoints(), lvl=Math.max(1,Math.floor(tot/200)+1);
-  $('#levelBadge').textContent=`Nivel ${lvl} · ${Math.round(tot)} pts`;
+  const P=progress();
+  $('#levelBadge').textContent=`${S.settings.profile.avatar} Nivel ${P.level} · ${Math.round(P.totalPts)} pts`;
+  renderRestBox(P);
   renderTimeline(); renderEntries(); renderMood();
 }
 function renderTimeline(){
@@ -955,6 +1099,214 @@ function renderUni(){
       scales:{x:{stacked:true,grid:{color:grid},border:{display:false},ticks:{color:tx,callback:v=>v+'h'}},y:{stacked:true,grid:{display:false},ticks:{color:tx}}}}});
 }
 
+/* ================= PROGRESO Y RECOMPENSAS ================= */
+let progCache=null;
+function weekSummary(ws){
+  const t=today(), s=S.settings; let study=0,uni=0,pts=0,screen=0,daysHit=0;
+  for(let i=0;i<7;i++){ const d=addDays(ws,i); if(d>t) break; const st=dayStats(d);
+    study+=st.by.estudio+st.by.tarea; uni+=UNI.reduce((a,c)=>a+st.by[c.id],0); pts+=st.net; screen+=st.screen; if(st.net>=s.dailyPts) daysHit++; }
+  const okStudy=study>=s.weekStudy*60, okPts=pts>=s.weekPts, okScreen=screen<=s.weekScreen*60;
+  return {ws,study,uni,pts,screen,daysHit,okStudy,okPts,okScreen};
+}
+function progress(){
+  const t=today(), key=dataVer+'|'+t;
+  if(progCache?.key===key) return progCache;
+  const s=S.settings, R=s.rewards, ents=allEntries();
+  const dates=[...new Set(ents.map(e=>e.date))].filter(d=>d<=t).sort();
+  const log=[], hit=new Set(); let totalPts=0;
+  dates.forEach(d=>{ const n=dayStats(d).net; totalPts+=n; if(n>=s.dailyPts){ hit.add(d); if(R.daily) log.push({date:d,label:'🎯 Objetivo diario',min:R.daily}); }});
+  let best=0,run=0,prev=null; [...hit].forEach(d=>{ run=prev&&addDays(prev,1)===d?run+1:1; best=Math.max(best,run); prev=d; });
+  let streak=0; for(let d=hit.has(t)?t:addDays(t,-1); hit.has(d); d=addDays(d,-1)) streak++;
+  const curWs=weekStart(t); let weeksPerfect=0, detox=0;
+  [...new Set(dates.map(weekStart))].sort().forEach(ws=>{
+    const w=weekSummary(ws), done=ws<curWs, end=done?addDays(ws,6):t;
+    if(w.okStudy&&R.weekStudy) log.push({date:end,label:'🏛️ Objetivo semanal de universidad',min:R.weekStudy});
+    if(w.okPts&&R.weekPts) log.push({date:end,label:'⭐ Objetivo semanal de puntos',min:R.weekPts});
+    if(done&&w.okScreen){ detox++; if(R.weekScreen) log.push({date:end,label:'🧘 Semana sin pasarte de pantallas',min:R.weekScreen}); }
+    if(done&&w.okStudy&&w.okPts&&w.okScreen) weeksPerfect++;
+  });
+  const used=[]; Object.values(S.months).forEach(m=>Object.entries(m.rest||{}).forEach(([d,v])=>v&&used.push({date:d,label:'🛋️ Descanso canjeado',min:-v})));
+  const earned=log.reduce((a,x)=>a+x.min,0), spent=-used.reduce((a,x)=>a+x.min,0);
+  const sumCat=ids=>ents.reduce((a,e)=>a+(ids.includes(e.cat)?e.min:0),0);
+  const P={key,totalPts,level:levelFor(totalPts),streak,bestStreak:best,daysHit:hit.size,weeksPerfect,detox,
+    earned,spent,balance:Math.max(0,earned-spent),log:log.concat(used).sort((a,b)=>b.date.localeCompare(a.date)),
+    entries:ents.length,uniMin:sumCat(UNI.map(c=>c.id)),lectMin:sumCat(['lectura']),manualMin:sumCat(['manual']),
+    closedTerms:subjects().filter(x=>x.closed).length,moodDays:Object.values(S.months).reduce((a,m)=>a+Object.keys(m.moods||{}).length,0),
+    friends:(s.friends||[]).filter(f=>friendData[f.uid]).length, week:weekSummary(curWs)};
+  P.badges=BADGES.filter(b=>b.ok(P)).map(b=>b.id);
+  return progCache=P;
+}
+function redeemRest(min){
+  const P=progress(), d=today(), k=d.slice(0,7);
+  min=Math.min(min,P.balance); if(min<1) return;
+  month(k).rest[d]=(month(k).rest[d]||0)+min; markDirty(k); renderAll();
+  toast(`Canjeados ${fmtH(min)} de descanso para hoy`,()=>{ month(k).rest[d]=Math.max(0,(month(k).rest[d]||0)-min); markDirty(k); renderAll(); });
+}
+function restOptsHtml(P){
+  const opts=[15,30,60,120].filter(m=>m<=P.balance);
+  if(P.balance>0 && !opts.includes(P.balance) && P.balance<=240) opts.push(P.balance);
+  return opts.length?opts.sort((a,b)=>a-b).map(m=>`<button class="btn sm" data-rest="${m}">${m===P.balance?'Todo · ':''}${fmtH(m)}</button>`).join(''):'<span class="small muted">Aún no tienes descanso para canjear. ¡Cumple una meta!</span>';
+}
+function bindRest(el){ el.querySelectorAll('[data-rest]').forEach(b=>b.onclick=()=>{ $('#restOpts').classList.add('hidden'); redeemRest(+b.dataset.rest); }); }
+function renderRestBox(P){
+  $('#restBal').textContent=fmtH(P.balance);
+  const td=restOn(today()); $('#restToday').textContent=td?` · hoy canjeados ${fmtH(td)}`:'';
+  $('#restBtn').disabled=P.balance<1;
+  $('#restOpts').innerHTML=restOptsHtml(P); bindRest($('#restOpts'));
+}
+$('#restBtn').onclick=()=>$('#restOpts').classList.toggle('hidden');
+function renderLogros(){
+  if($('#tab-logros').classList.contains('hidden')) return;
+  const P=progress();
+  $('#restBig').textContent=fmtH(P.balance);
+  $('#restSum').textContent=`Ganado en total: ${fmtH(P.earned)} · canjeado: ${fmtH(P.spent)}`;
+  $('#restOpts2').innerHTML=restOptsHtml(P); bindRest($('#restOpts2'));
+  $('#restLog').innerHTML=P.log.slice(0,12).map(x=>`<div class="item"><span class="muted small" style="width:52px">${fmtDay(x.date)}</span><span class="grow">${x.label}</span><span class="pts" style="color:${x.min<0?'var(--text-2)':'var(--good)'}">${x.min<0?'−':'+'}${fmtH(Math.abs(x.min))}</span></div>`).join('')||'<div class="muted small">Todavía nada. Cumple tu objetivo diario para ganar tu primer descanso.</div>';
+  $('#badgeCount').textContent=`${P.badges.length} de ${BADGES.length}`;
+  $('#badgeGrid').innerHTML=BADGES.map(b=>`<div class="badge ${P.badges.includes(b.id)?'':'off'}" title="${esc(b.d)}"><span class="ic">${b.ic}</span><span><b>${b.n}</b><small>${b.d}</small></span></div>`).join('');
+}
+function fillRewards(){ const R=S.settings.rewards; $('#rwDaily').value=R.daily; $('#rwWeekStudy').value=R.weekStudy; $('#rwWeekPts').value=R.weekPts; $('#rwWeekScreen').value=R.weekScreen; }
+$('#saveRewards').onclick=()=>{ const R=S.settings.rewards, n=(id,d)=>{const v=Number($(id).value);return Number.isFinite(v)&&v>=0?Math.round(v):d};
+  R.daily=n('#rwDaily',R.daily); R.weekStudy=n('#rwWeekStudy',R.weekStudy); R.weekPts=n('#rwWeekPts',R.weekPts); R.weekScreen=n('#rwWeekScreen',R.weekScreen);
+  markDirty('settings'); renderAll(); toast('Recompensas guardadas'); };
+
+/* ================= AMIGOS ================= */
+let signupName='', friendData={}, friendState={}, incoming=[], reqUnsub=null, socialOn=false, socialErr='', friendTimer=null, pubTimer=null, lastPub='', rankMode='pts';
+const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const isDenied=e=>e?.code==='permission-denied'||/permission/i.test(e?.message||'');
+function setSocialErr(e){ socialErr=isDenied(e)?'rules':'net'; renderAmigos(); }
+function inviteCode(){ try{ const c=new URLSearchParams(location.search).get('amigo'); return c?c.toUpperCase().replace(/[^A-Z0-9]/g,''):''; }catch(e){ return ''; } }
+async function ensureCode(){
+  const pr=S.settings.profile;
+  if(!pr.name){ pr.name=(signupName||user.displayName||user.email||'').split('@')[0].slice(0,30); markDirty('settings'); }
+  if(pr.code) return;
+  for(let i=0;i<6;i++){
+    const code=Array.from({length:6},()=>CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)]).join('');
+    try{ await fs.collection('codes').doc(code).set({uid:user.uid}); pr.code=code; markDirty('settings'); return; }
+    catch(e){ if(!isDenied(e)) throw e; }
+  }
+  throw {code:'permission-denied'};
+}
+async function socialStart(){
+  if(socialOn||!user||!fs) return; socialOn=true; socialErr='';
+  try{ await ensureCode(); }catch(e){ console.warn(e); setSocialErr(e); }
+  reqUnsub=fs.collection('requests').doc(user.uid).collection('in').onSnapshot(snap=>{
+    incoming=snap.docs.map(d=>({from:d.id,...d.data()}));
+    incoming.filter(r=>(S.settings.friends||[]).some(f=>f.uid===r.from)).forEach(r=>acceptReq(r,true));
+    renderAmigos();
+  },e=>{ console.warn(e); setSocialErr(e); });
+  schedulePublish(true); fetchFriends();
+  clearInterval(friendTimer); friendTimer=setInterval(()=>{ if(!$('#tab-amigos').classList.contains('hidden')) fetchFriends(); },60000);
+  const inv=inviteCode();
+  if(inv && inv!==S.settings.profile.code){ $('#friendCode').value=inv; document.querySelector('nav.tabs [data-tab=amigos]').click();
+    history.replaceState(null,'',location.pathname); }
+}
+function socialStop(){ if(reqUnsub){reqUnsub();reqUnsub=null;} clearInterval(friendTimer); clearTimeout(pubTimer); socialOn=false; friendData={}; friendState={}; incoming=[]; lastPub=''; signupName=''; $('#friendMsg').innerHTML=''; $('#friendCode').value=''; $('#restOpts').classList.add('hidden'); }
+function profileDoc(){
+  const P=progress(), s=S.settings, w=P.week, pr=s.profile;
+  return {name:pr.name||'Sin nombre', avatar:pr.avatar, code:pr.code||'', level:P.level, title:titleFor(P.level), totalPts:Math.round(P.totalPts),
+    streak:P.streak, bestStreak:P.bestStreak, badges:P.badges, friends:(s.friends||[]).map(f=>f.uid),
+    week:{ws:w.ws, pts:Math.round(w.pts), uni:r1(w.uni/60), study:r1(w.study/60), studyGoal:s.weekStudy, ptsGoal:s.weekPts, screen:r1(w.screen/60), screenMax:s.weekScreen,
+      daysHit:w.daysHit, goals:[w.okStudy,w.okPts,w.okScreen].filter(Boolean).length}};
+}
+function schedulePublish(now){ if(!socialOn&&!now) return; clearTimeout(pubTimer); pubTimer=setTimeout(publishProfile,now?50:2500); }
+async function publishProfile(){
+  if(!user||!fs) return;
+  const doc=profileDoc(), j=JSON.stringify(doc); if(j===lastPub) return;
+  try{ await fs.collection('profiles').doc(user.uid).set({...doc,updated:Date.now()}); lastPub=j; }
+  catch(e){ console.warn(e); setSocialErr(e); }
+}
+async function fetchFriends(){
+  if(!user||!fs) return;
+  await Promise.all((S.settings.friends||[]).map(async f=>{
+    try{ const d=await fs.collection('profiles').doc(f.uid).get();
+      if(d.exists){ friendData[f.uid]=d.data(); friendState[f.uid]='ok'; if(f.name!==d.data().name){ f.name=d.data().name; } }
+      else friendState[f.uid]='pending';
+    }catch(e){ friendState[f.uid]=isDenied(e)?'pending':'error'; }
+  }));
+  dataVer++; renderAmigos(); renderToday(); schedulePublish();
+}
+async function addFriend(raw){
+  const code=String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,''), pr=S.settings.profile, msg=t=>$('#friendMsg').innerHTML=t;
+  if(code.length<4) return msg('<div class="alert warn">Escribe el código de tu amigo/a.</div>');
+  if(code===pr.code) return msg('<div class="alert warn">Ese es tu propio código 😄</div>');
+  try{
+    const c=await fs.collection('codes').doc(code).get();
+    if(!c.exists) return msg('<div class="alert bad">No hay nadie con ese código. Revísalo.</div>');
+    const fuid=c.data().uid, fl=(S.settings.friends||=[]);
+    if(fl.some(f=>f.uid===fuid)) return msg('<div class="alert warn">Ya lo tienes añadido.</div>');
+    fl.push({uid:fuid,code,since:today()}); markDirty('settings');
+    lastPub=''; await publishProfile();
+    const req=incoming.find(r=>r.from===fuid);
+    if(req) await fs.collection('requests').doc(user.uid).collection('in').doc(fuid).delete();
+    else await fs.collection('requests').doc(fuid).collection('in').doc(user.uid).set({name:pr.name,avatar:pr.avatar,code:pr.code,at:Date.now()});
+    $('#friendCode').value='';
+    msg(`<div class="alert good">${req?'¡Ya sois amigos!':'Solicitud enviada. Cuando la acepte, aparecerá en la comparativa.'}</div>`);
+    fetchFriends();
+  }catch(e){ console.warn(e); msg(`<div class="alert bad">${isDenied(e)?'Falta actualizar las reglas de Firestore (mira el README).':'No se ha podido conectar. Inténtalo de nuevo.'}</div>`); }
+}
+async function acceptReq(r,silent){
+  const fl=(S.settings.friends||=[]);
+  if(!fl.some(f=>f.uid===r.from)){ fl.push({uid:r.from,code:r.code||'',name:r.name||'',since:today()}); markDirty('settings'); }
+  try{ lastPub=''; await publishProfile(); await fs.collection('requests').doc(user.uid).collection('in').doc(r.from).delete(); }catch(e){ console.warn(e); }
+  if(!silent) toast(`¡Ahora eres amigo/a de ${r.name||'tu contacto'}!`);
+  fetchFriends();
+}
+async function rejectReq(r){ try{ await fs.collection('requests').doc(user.uid).collection('in').doc(r.from).delete(); }catch(e){ console.warn(e); } }
+async function removeFriend(uid){
+  const f=(S.settings.friends||[]).find(x=>x.uid===uid), name=friendData[uid]?.name||f?.name||'este contacto';
+  if(!confirm(`¿Quitar a ${name} de tus amigos? Dejará de ver tu progreso.`)) return;
+  S.settings.friends=S.settings.friends.filter(x=>x.uid!==uid); delete friendData[uid]; delete friendState[uid];
+  markDirty('settings'); lastPub=''; await publishProfile();
+  try{ await fs.collection('requests').doc(uid).collection('in').doc(user.uid).delete(); }catch(e){}
+  renderAmigos();
+}
+function goalBars(w,cur){
+  if(!cur) return '<div class="goals"><span class="muted">Sin actividad esta semana</span></div>';
+  const bar=(lbl,v,g,unit,inv)=>{const pct=g?Math.max(0,Math.min(100,v/g*100)):0, ok=inv?v<=g:v>=g;
+    return `<div><span>${lbl} ${ok?'✓':''}</span> <b>${v}</b>/${g}${unit}<div class="bar ${inv?(ok?'good':'bad'):(ok?'good':'')}"><i style="width:${pct}%"></i></div></div>`};
+  return `<div class="goals">${bar('🏛️ Uni',w.study,w.studyGoal,' h')}${bar('⭐ Puntos',w.pts,w.ptsGoal,'')}${bar('📺 Pantallas',w.screen,w.screenMax,' h',true)}</div>`;
+}
+function renderAmigos(){
+  if($('#tab-amigos').classList.contains('hidden')) return;
+  const P=progress(), pr=S.settings.profile;
+  $('#socialAlert').innerHTML=socialErr==='rules'?'<div class="alert warn" style="margin:0 0 16px">Para usar Amigos hay que actualizar las reglas de Firestore en la consola de Firebase (están en el archivo <b>firestore.rules</b> y en el README).</div>':socialErr==='net'?'<div class="alert warn" style="margin:0 0 16px">No se ha podido conectar con la nube. Se reintentará.</div>':'';
+  $('#profTitle').textContent=`Nivel ${P.level} · ${titleFor(P.level)}`;
+  $('#profAvatar').textContent=pr.avatar;
+  if(document.activeElement!==$('#profName')) $('#profName').value=pr.name||'';
+  $('#profAvatars').innerHTML=AVATARS.map(([a,l])=>`<button class="av ${pr.avatar===a?'on':''}" data-av="${a}" ${P.level<l?'disabled':''} title="${P.level<l?'Se desbloquea en el nivel '+l:a}">${a}${P.level<l?`<small>N${l}</small>`:''}</button>`).join('');
+  $('#profAvatars').querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{ pr.avatar=b.dataset.av; markDirty('settings'); renderAll(); });
+  $('#myCode').textContent=pr.code||'······';
+  $('#reqIn').innerHTML=incoming.length?'<div class="small muted">Solicitudes recibidas</div>'+incoming.map(r=>`<div class="req"><span class="avatar sm">${esc(r.avatar||'🙂')}</span><span class="grow"><b>${esc(r.name||'Alguien')}</b><br><span class="small muted">quiere comparar objetivos contigo</span></span><button class="btn sm primary" data-acc="${esc(r.from)}">Aceptar</button><button class="btn sm" data-rej="${esc(r.from)}">Rechazar</button></div>`).join(''):'';
+  $('#reqIn').querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>acceptReq(incoming.find(r=>r.from===b.dataset.acc)));
+  $('#reqIn').querySelectorAll('[data-rej]').forEach(b=>b.onclick=()=>rejectReq(incoming.find(r=>r.from===b.dataset.rej)));
+  // ranking
+  const ws=weekStart(today());
+  $('#weekLbl').textContent=`semana del ${fmtDay(ws)}`;
+  const me={uid:'me',...profileDoc(),me:true};
+  const people=[me,...(S.settings.friends||[]).filter(f=>friendState[f.uid]==='ok').map(f=>({uid:f.uid,...friendData[f.uid]}))];
+  const val=x=>{const cur=x.week?.ws===ws; return rankMode==='pts'?(cur?x.week.pts:0):rankMode==='uni'?(cur?x.week.study:0):rankMode==='goals'?(cur?x.week.goals*10+x.week.daysHit:0):(x.streak||0)};
+  const show=x=>{const cur=x.week?.ws===ws; return rankMode==='pts'?[cur?x.week.pts:0,'pts esta semana']:rankMode==='uni'?[(cur?x.week.study:0)+' h','estudio + tareas']:rankMode==='goals'?[`${cur?x.week.goals:0}/3`,`objetivos · ${cur?x.week.daysHit:0} días`]:[`${x.streak||0} 🔥`,`días seguidos · récord ${x.bestStreak||0}`]};
+  people.sort((a,b)=>val(b)-val(a));
+  const pend=(S.settings.friends||[]).filter(f=>friendState[f.uid]!=='ok');
+  $('#ranking').innerHTML=people.map((x,i)=>{const [v,l]=show(x), cur=x.week?.ws===ws;
+    return `<div class="friend ${x.me?'me':''}"><span class="rk">${['🥇','🥈','🥉'][i]||i+1}</span><span class="avatar sm">${esc(x.avatar||'🙂')}</span>
+      <span class="nm"><b>${esc(x.name||'Sin nombre')}${x.me?' (tú)':''}</b><small>Nivel ${x.level||1} · ${esc(x.title||titleFor(x.level||1))}</small></span>
+      <span class="val">${v}<small>${l}</small></span>${goalBars(x.week,cur)}
+      <span class="bdg">${(x.badges||[]).map(id=>BADGES.find(b=>b.id===id)?.ic||'').join('')}${x.me?'':` <button class="x" data-rm="${esc(x.uid)}" title="Quitar amigo/a" style="float:right">✕</button>`}</span></div>`}).join('')
+    +(pend.length?`<div class="small muted" style="margin-top:12px">Esperando a que acepten: ${pend.map(f=>`${esc(f.name||f.code||'contacto')} <button class="x" data-rm="${esc(f.uid)}" title="Cancelar">✕</button>`).join(' · ')}</div>`:'')
+    +(people.length===1?'<div class="small muted" style="margin-top:12px">Comparte tu código o tu enlace con tus amigos para empezar a comparar.</div>':'');
+  $('#ranking').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>removeFriend(b.dataset.rm));
+}
+let nameT=null;
+$('#profName').addEventListener('input',()=>{ clearTimeout(nameT); nameT=setTimeout(()=>{ S.settings.profile.name=$('#profName').value.trim().slice(0,30); markDirty('settings'); },700); });
+$('#addFriendForm').addEventListener('submit',ev=>{ ev.preventDefault(); addFriend($('#friendCode').value); });
+$('#rankCtl').querySelectorAll('button').forEach(b=>b.onclick=()=>{ rankMode=b.dataset.m; $('#rankCtl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderAmigos(); });
+$('#refreshFriends').onclick=()=>{ fetchFriends(); toast('Actualizado'); };
+async function copyTxt(t,ok){ try{ await navigator.clipboard.writeText(t); toast(ok); }catch(e){ prompt('Copia esto:',t); } }
+$('#copyCode').onclick=()=>S.settings.profile.code&&copyTxt(S.settings.profile.code,'Código copiado');
+$('#copyLink').onclick=()=>S.settings.profile.code&&copyTxt(`${location.origin}${location.pathname}?amigo=${S.settings.profile.code}`,'Enlace de invitación copiado');
+
 /* ================= RENDER: AJUSTES ================= */
 function renderGoals(){
   const s=S.settings, ws=weekStart(today()), days=[...Array(7)].map((_,i)=>addDays(ws,i)).filter(d=>d<=today());
@@ -985,7 +1337,7 @@ $('#saveSettings').onclick=()=>{
   document.querySelectorAll('[data-mult]').forEach(i=>{const v=Number(i.value);if(Number.isFinite(v)&&v>=0) s.mult[i.dataset.mult]=v});
   markDirty('settings'); renderAll(); toast('Ajustes guardados');
 };
-$('#resetSettings').onclick=()=>{ const keep=subjects(); S.settings=structuredClone(DEFAULTS); S.settings.subjects=keep; markDirty('settings'); fillSettings(); renderAll(); toast('Valores por defecto restaurados'); };
+$('#resetSettings').onclick=()=>{ const o=S.settings; S.settings=structuredClone(DEFAULTS); ['subjects','profile','friends','rewards'].forEach(k=>S.settings[k]=o[k]??S.settings[k]); markDirty('settings'); fillSettings(); renderAll(); toast('Valores por defecto restaurados'); };
 
 /* ================= EXCEL ================= */
 function buildRows(){
@@ -1054,8 +1406,10 @@ $('#importFile').addEventListener('change',async ev=>{
 /* ================= NAVEGACIÓN ================= */
 document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
-  ['hoy','uni','stats','ajustes','excel'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==b.dataset.tab));
+  ['hoy','uni','amigos','logros','stats','ajustes','excel'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==b.dataset.tab));
   if(b.dataset.tab==='ajustes') fillSettings();
+  if(b.dataset.tab==='logros') fillRewards();
+  if(b.dataset.tab==='amigos') fetchFriends();
   renderAll();
 });
 $('#rangeCtl').querySelectorAll('button').forEach(b=>b.onclick=()=>{range=+b.dataset.r;$('#rangeCtl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderStats();});
@@ -1064,7 +1418,7 @@ $('#targetCtl').querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(S.timer
 $('#timerBtn').onclick=()=>S.timer?stopTimer(true):startTimer();
 $('#timerCancel').onclick=()=>{ const t=S.timer; stopTimer(false); toast('Temporizador descartado',()=>{S.timer=t;markDirty('settings');renderAll();}); };
 
-function renderAll(){ renderTimerCats(); tickTimer(); renderToday(); renderGoals(); renderStats(); renderUni(); fillManualSubj(); }
+function renderAll(){ renderTimerCats(); tickTimer(); renderToday(); renderGoals(); renderStats(); renderUni(); renderLogros(); renderAmigos(); fillManualSubj(); }
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',renderAll);
 initManual(); fillSettings(); setAuthMode('login');
 setInterval(()=>{ if(user) tickTimer(); },1000);
