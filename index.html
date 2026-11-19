@@ -1179,6 +1179,7 @@ function inviteCode(){ try{ const c=new URLSearchParams(location.search).get('am
 async function ensureCode(){
   const pr=S.settings.profile;
   if(!pr.name){ pr.name=(signupName||user.displayName||user.email||'').split('@')[0].slice(0,30); markDirty('settings'); }
+  signupName='';
   if(pr.code) return;
   for(let i=0;i<6;i++){
     const code=Array.from({length:6},()=>CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)]).join('');
@@ -1201,7 +1202,7 @@ async function socialStart(){
   if(inv && inv!==S.settings.profile.code){ $('#friendCode').value=inv; document.querySelector('nav.tabs [data-tab=amigos]').click();
     history.replaceState(null,'',location.pathname); }
 }
-function socialStop(){ if(reqUnsub){reqUnsub();reqUnsub=null;} clearInterval(friendTimer); clearTimeout(pubTimer); socialOn=false; friendData={}; friendState={}; incoming=[]; lastPub=''; signupName=''; $('#friendMsg').innerHTML=''; $('#friendCode').value=''; $('#restOpts').classList.add('hidden'); }
+function socialStop(){ if(reqUnsub){reqUnsub();reqUnsub=null;} clearInterval(friendTimer); clearTimeout(pubTimer); socialOn=false; friendData={}; friendState={}; incoming=[]; lastPub=''; $('#friendMsg').innerHTML=''; $('#friendCode').value=''; $('#restOpts').classList.add('hidden'); }
 function profileDoc(){
   const P=progress(), s=S.settings, w=P.week, pr=s.profile;
   return {name:pr.name||'Sin nombre', avatar:pr.avatar, code:pr.code||'', level:P.level, title:titleFor(P.level), totalPts:Math.round(P.totalPts),
